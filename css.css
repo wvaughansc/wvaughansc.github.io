@@ -62,7 +62,7 @@ body
 
 #menu ul li a:link, #menu ul li a:active, #menu ul li a:visited
 {
-	color:           #c6280c;	
+	color:           rgba(255, 255, 255, 0.85);	
 	padding:         10px 7px 10px 7px;
 	font-size:       1em;
 
