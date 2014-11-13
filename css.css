@@ -34,7 +34,7 @@ body
 	position:        relative;
 	font-family:     Times;
 	font-size:       30px;
-	color:           rgb(3, 84, 121);;
+	color:           #fff;
 	top:             210px;
 	left:            12px;
 }
@@ -62,7 +62,7 @@ body
 
 #menu ul li a:link, #menu ul li a:active, #menu ul li a:visited
 {
-	color:           #767676;	
+	color:           rgb(3, 84, 121);	
 	padding:         10px 7px 10px 7px;
 	font-size:       1em;
 
