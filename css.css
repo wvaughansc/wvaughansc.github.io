@@ -2,7 +2,7 @@
 
 body
 {
-	font-size:       70.5%; 
+	font-size:       65.5%; 
 	margin:          0;
 	padding:         10;
 	background-color: #000;
@@ -110,7 +110,7 @@ h1
 {
 	margin:          0;
 	font-weight:     normal;
-	color:           #6A7919;
+	color:           rgb(3, 84, 121);
 	font-size:       2.5em;
 	font-family:Times;
 }
