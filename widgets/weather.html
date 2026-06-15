@@ -9,89 +9,83 @@
         body {
             background: transparent;
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-            padding: 1rem;
+            padding: 0;
+            margin: 0;
         }
         .weather-container {
             background: #1a202c;
             border: 1px solid #2d3748;
-            border-radius: 8px;
-            padding: 1.5rem;
-            max-width: 400px;
+            padding: 0.8rem 1.2rem;
             color: #e0e0e0;
-        }
-        .weather-header {
             display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            margin-bottom: 1.5rem;
+            align-items: center;
+            gap: 1.5rem;
+            width: 100%;
+            min-height: 50px;
         }
         .weather-location {
-            font-size: 0.9rem;
+            font-size: 0.75rem;
             color: #a0aec0;
             text-transform: uppercase;
             letter-spacing: 0.5px;
             font-weight: 600;
+            white-space: nowrap;
         }
         .weather-main {
             display: flex;
             align-items: center;
-            gap: 1rem;
+            gap: 0.6rem;
+            flex-shrink: 0;
         }
         .weather-icon {
-            font-size: 3rem;
+            font-size: 1.8rem;
         }
         .weather-temp {
-            font-size: 2.5rem;
+            font-size: 1.3rem;
             font-weight: 700;
             color: #fff;
             line-height: 1;
         }
         .weather-condition {
-            font-size: 0.95rem;
+            font-size: 0.8rem;
             color: #cbd5e0;
-            margin-top: 0.3rem;
         }
         .weather-details {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 1rem;
-            margin-top: 1.5rem;
-            padding-top: 1.5rem;
-            border-top: 1px solid #2d3748;
+            display: flex;
+            gap: 1.5rem;
+            margin-left: auto;
+            flex-shrink: 0;
         }
         .detail-item {
             display: flex;
             flex-direction: column;
+            align-items: center;
+            gap: 0.2rem;
         }
         .detail-label {
-            font-size: 0.75rem;
+            font-size: 0.7rem;
             color: #718096;
             text-transform: uppercase;
-            letter-spacing: 0.5px;
-            margin-bottom: 0.3rem;
+            letter-spacing: 0.4px;
         }
         .detail-value {
-            font-size: 1.1rem;
+            font-size: 0.95rem;
             font-weight: 600;
             color: #e0e0e0;
         }
         .loading {
-            text-align: center;
             color: #718096;
-            padding: 2rem 1rem;
-            font-size: 0.9rem;
+            font-size: 0.85rem;
         }
         .error {
-            text-align: center;
             color: #ef4444;
-            padding: 1rem;
-            font-size: 0.9rem;
+            font-size: 0.85rem;
         }
     </style>
 </head>
 <body>
     <div class="weather-container" id="weatherWidget">
-        <div class="loading">Loading weather...</div>
+        <span class="loading">Loading weather...</span>
     </div>
 
     <script>
@@ -138,9 +132,7 @@
                 
                 const widget = document.getElementById('weatherWidget');
                 widget.innerHTML = `
-                    <div class="weather-header">
-                        <div class="weather-location">🌍 Taylors, SC</div>
-                    </div>
+                    <div class="weather-location">🌍 Taylors</div>
                     <div class="weather-main">
                         <div class="weather-icon">${weather.emoji}</div>
                         <div>
@@ -150,7 +142,7 @@
                     </div>
                     <div class="weather-details">
                         <div class="detail-item">
-                            <div class="detail-label">Feels Like</div>
+                            <div class="detail-label">Feels</div>
                             <div class="detail-value">${Math.round(current.apparent_temperature)}°</div>
                         </div>
                         <div class="detail-item">
@@ -161,18 +153,10 @@
                             <div class="detail-label">Wind</div>
                             <div class="detail-value">${Math.round(current.wind_speed_10m)} mph</div>
                         </div>
-                        <div class="detail-item">
-                            <div class="detail-label">Updated</div>
-                            <div class="detail-value">${new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}</div>
-                        </div>
                     </div>
                 `;
             } catch (error) {
-                document.getElementById('weatherWidget').innerHTML = `
-                    <div class="error">
-                        Unable to load weather. Check your connection.
-                    </div>
-                `;
+                document.getElementById('weatherWidget').innerHTML = `<span class="error">Unable to load weather</span>`;
             }
         }
         
