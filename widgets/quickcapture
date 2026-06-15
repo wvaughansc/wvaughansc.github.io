@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quick Capture</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            background: #0f0f0f;
+            color: #e0e0e0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            padding: 1.5rem;
+            min-height: 100vh;
+        }
+        .container { max-width: 500px; margin: 0 auto; }
+        h1 {
+            font-size: 1.3rem;
+            margin-bottom: 1.5rem;
+            font-weight: 600;
+            color: #fff;
+        }
+        .button-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        .capture-btn {
+            padding: 1.2rem;
+            background: linear-gradient(135deg, #2d3748 0%, #1a202c 100%);
+            border: 1px solid #4a5568;
+            border-radius: 8px;
+            color: #e0e0e0;
+            font-weight: 500;
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.2s ease;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 80px;
+            flex-wrap: wrap;
+            font-size: 0.95rem;
+        }
+        .capture-btn:hover {
+            background: linear-gradient(135deg, #4a5568 0%, #2d3748 100%);
+            border-color: #718096;
+            transform: translateY(-2px);
+        }
+        .capture-btn.accent {
+            background: linear-gradient(135deg, #3b82f6 0%, #1e40af 100%);
+            border-color: #1e40af;
+        }
+        .capture-btn.accent:hover {
+            background: linear-gradient(135deg, #2563eb 0%, #1e3a8a 100%);
+        }
+        .quick-ref {
+            background: #1a202c;
+            border: 1px solid #2d3748;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-top: 2rem;
+        }
+        .quick-ref h2 {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #a0aec0;
+            margin-bottom: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .ref-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.8rem 0;
+            border-bottom: 1px solid #2d3748;
+            font-size: 0.95rem;
+        }
+        .ref-item:last-child { border-bottom: none; }
+        .ref-label { color: #a0aec0; }
+        .ref-value { color: #fff; font-weight: 500; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Quick Capture</h1>
+        
+        <div class="button-grid">
+            <a href="https://notion.so/[YOUR_TODD_FORM_ID]" target="_blank" class="capture-btn accent">
+                📋 Todd Agenda
+            </a>
+            <a href="https://notion.so/[YOUR_KALA_FORM_ID]" target="_blank" class="capture-btn">
+                💬 Kala Note
+            </a>
+            <a href="https://notion.so/[YOUR_TASK_FORM_ID]" target="_blank" class="capture-btn">
+                ✅ Quick Task
+            </a>
+            <a href="https://notion.so/[YOUR_PRAYER_FORM_ID]" target="_blank" class="capture-btn">
+                🙏 Prayer List
+            </a>
+            <a href="https://notion.so/[YOUR_DEFER_FORM_ID]" target="_blank" class="capture-btn">
+                ⏸️ Defer This
+            </a>
+            <a href="javascript:void(0)" class="capture-btn" onclick="logTime()">
+                ⏱️ Check In
+            </a>
+        </div>
+
+        <div class="quick-ref">
+            <h2>Today's Anchors</h2>
+            <div class="ref-item">
+                <span class="ref-label">Workout</span>
+                <span class="ref-value">5:45–6:15 AM</span>
+            </div>
+            <div class="ref-item">
+                <span class="ref-label">Personal Time</span>
+                <span class="ref-value">6:30–7:15 PM</span>
+            </div>
+            <div class="ref-item">
+                <span class="ref-label">Check w/ Kala</span>
+                <span class="ref-value">8:30 PM</span>
+            </div>
+            <div id="nextMeeting" class="ref-item">
+                <span class="ref-label">Next Meeting</span>
+                <span class="ref-value">—</span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Replace these with your actual Notion form URLs
+        const notionForms = {
+            todd: "https://notion.so/YOUR_FORM_URL",
+            kala: "https://notion.so/YOUR_FORM_URL",
+            task: "https://notion.so/YOUR_FORM_URL",
+            prayer: "https://notion.so/YOUR_FORM_URL",
+            defer: "https://notion.so/YOUR_FORM_URL"
+        };
+
+        function logTime() {
+            const now = new Date();
+            const time = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+            alert(`Checked in at ${time}\n\nWhat's on your mind?`);
+        }
+
+        function getNextMeeting() {
+            const now = new Date();
+            const dayOfWeek = now.getDay();
+            const hour = now.getHours();
+
+            const meetings = {
+                1: { name: "EAM Status", time: "10:00 AM" },  // Tuesday
+                2: { name: "Worship Leader", time: "1:15 PM" }, // Wednesday
+                4: { name: "DUX Meeting", time: "8:30 AM" }    // Thursday (every other)
+            };
+
+            if (meetings[dayOfWeek]) {
+                return meetings[dayOfWeek];
+            }
+            return { name: "No meeting today", time: "—" };
+        }
+
+        document.getElementById('nextMeeting').innerHTML = `
+            <span class="ref-label">${getNextMeeting().name}</span>
+            <span class="ref-value">${getNextMeeting().time}</span>
+        `;
+    </script>
+</body>
+</html>
