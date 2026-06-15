@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sunday Reset Ritual</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            background: #0f0f0f;
+            color: #e0e0e0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            padding: 2rem 1.5rem;
+            min-height: 100vh;
+        }
+        .container { max-width: 600px; margin: 0 auto; }
+        .header {
+            text-align: center;
+            margin-bottom: 2.5rem;
+        }
+        .header h1 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 0.5rem;
+        }
+        .header p {
+            color: #a0aec0;
+            font-size: 0.95rem;
+        }
+        .section {
+            margin-bottom: 2.5rem;
+        }
+        .section-title {
+            font-size: 1rem;
+            font-weight: 600;
+            color: #fff;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+        }
+        .section-icon {
+            font-size: 1.3rem;
+        }
+        .input-group {
+            margin-bottom: 1.2rem;
+        }
+        .input-group label {
+            display: block;
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: #cbd5e0;
+            margin-bottom: 0.5rem;
+        }
+        textarea, input {
+            width: 100%;
+            padding: 0.8rem;
+            background: #1a202c;
+            border: 1px solid #2d3748;
+            border-radius: 6px;
+            color: #e0e0e0;
+            font-family: inherit;
+            font-size: 0.95rem;
+            resize: vertical;
+            transition: border-color 0.2s;
+        }
+        textarea:focus, input:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+        textarea {
+            min-height: 80px;
+        }
+        .wins-container {
+            display: flex;
+            flex-direction: column;
+            gap: 0.8rem;
+        }
+        .win-item {
+            display: flex;
+            gap: 0.8rem;
+            align-items: flex-start;
+        }
+        .win-icon {
+            flex-shrink: 0;
+            width: 24px;
+            height: 24px;
+            background: #2d3748;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-top: 0.6rem;
+            font-size: 1rem;
+        }
+        .win-input {
+            flex: 1;
+        }
+        .win-input input {
+            width: 100%;
+        }
+        .priority-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.8rem;
+        }
+        .priority-item {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+        }
+        .priority-number {
+            flex-shrink: 0;
+            width: 28px;
+            height: 28px;
+            background: #3b82f6;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-weight: 600;
+            font-size: 0.85rem;
+        }
+        .priority-input {
+            flex: 1;
+        }
+        .priority-input input {
+            width: 100%;
+        }
+        .buttons {
+            display: flex;
+            gap: 1rem;
+            margin-top: 2.5rem;
+        }
+        button {
+            flex: 1;
+            padding: 1rem;
+            border: none;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .btn-save {
+            background: linear-gradient(135deg, #3b82f6 0%, #1e40af 100%);
+            color: white;
+        }
+        .btn-save:hover {
+            background: linear-gradient(135deg, #2563eb 0%, #1e3a8a 100%);
+            transform: translateY(-2px);
+        }
+        .btn-clear {
+            background: #2d3748;
+            color: #e0e0e0;
+            border: 1px solid #4a5568;
+        }
+        .btn-clear:hover {
+            background: #4a5568;
+            border-color: #718096;
+        }
+        .saved-indicator {
+            display: none;
+            text-align: center;
+            color: #10b981;
+            font-size: 0.9rem;
+            margin-top: 1rem;
+            font-weight: 500;
+        }
+        .saved-indicator.show {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🕊️ Sunday Reset</h1>
+            <p>Reflect on the week. Plan with intention.</p>
+        </div>
+
+        <form id="resetForm">
+            <!-- WINS SECTION -->
+            <div class="section">
+                <div class="section-title">
+                    <span class="section-icon">✨</span>
+                    Three Wins This Week
+                </div>
+                <div class="wins-container">
+                    <div class="win-item">
+                        <div class="win-icon">1</div>
+                        <div class="win-input">
+                            <input type="text" id="win1" placeholder="What went well?" />
+                        </div>
+                    </div>
+                    <div class="win-item">
+                        <div class="win-icon">2</div>
+                        <div class="win-input">
+                            <input type="text" id="win2" placeholder="What went well?" />
+                        </div>
+                    </div>
+                    <div class="win-item">
+                        <div class="win-icon">3</div>
+                        <div class="win-input">
+                            <input type="text" id="win3" placeholder="What went well?" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- HARD/CHANGE SECTION -->
+            <div class="section">
+                <div class="section-title">
+                    <span class="section-icon">🔥</span>
+                    What Was Hard or Needs to Change?
+                </div>
+                <div class="input-group">
+                    <textarea id="hardSection" placeholder="Be honest. What drained you? What do you want different next week?"></textarea>
+                </div>
+            </div>
+
+            <!-- PRIORITIES SECTION -->
+            <div class="section">
+                <div class="section-title">
+                    <span class="section-icon">🎯</span>
+                    Top 3 Priorities for Next Week
+                </div>
+                <div class="priority-list">
+                    <div class="priority-item">
+                        <div class="priority-number">1</div>
+                        <div class="priority-input">
+                            <input type="text" id="priority1" placeholder="Priority 1" />
+                        </div>
+                    </div>
+                    <div class="priority-item">
+                        <div class="priority-number">2</div>
+                        <div class="priority-input">
+                            <input type="text" id="priority2" placeholder="Priority 2" />
+                        </div>
+                    </div>
+                    <div class="priority-item">
+                        <div class="priority-number">3</div>
+                        <div class="priority-input">
+                            <input type="text" id="priority3" placeholder="Priority 3" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PROTECT SECTION -->
+            <div class="section">
+                <div class="section-title">
+                    <span class="section-icon">🛡️</span>
+                    One Thing to Protect Next Week
+                </div>
+                <div class="input-group">
+                    <textarea id="protectSection" placeholder="Personal time? Family margin? A specific commitment? What needs protecting?"></textarea>
+                </div>
+            </div>
+
+            <!-- BUTTONS -->
+            <div class="buttons">
+                <button type="button" class="btn-save" onclick="saveReset()">Save to Local</button>
+                <button type="button" class="btn-clear" onclick="clearForm()">Clear</button>
+            </div>
+
+            <div class="saved-indicator" id="savedMsg">✓ Saved locally (refresh this page anytime to load)</div>
+        </form>
+    </div>
+
+    <script>
+        // Load saved data on page load
+        function loadReset() {
+            const saved = localStorage.getItem('sundayReset');
+            if (saved) {
+                const data = JSON.parse(saved);
+                document.getElementById('win1').value = data.win1 || '';
+                document.getElementById('win2').value = data.win2 || '';
+                document.getElementById('win3').value = data.win3 || '';
+                document.getElementById('hardSection').value = data.hard || '';
+                document.getElementById('priority1').value = data.priority1 || '';
+                document.getElementById('priority2').value = data.priority2 || '';
+                document.getElementById('priority3').value = data.priority3 || '';
+                document.getElementById('protectSection').value = data.protect || '';
+            }
+        }
+
+        function saveReset() {
+            const data = {
+                win1: document.getElementById('win1').value,
+                win2: document.getElementById('win2').value,
+                win3: document.getElementById('win3').value,
+                hard: document.getElementById('hardSection').value,
+                priority1: document.getElementById('priority1').value,
+                priority2: document.getElementById('priority2').value,
+                priority3: document.getElementById('priority3').value,
+                protect: document.getElementById('protectSection').value,
+                savedAt: new Date().toLocaleString()
+            };
+
+            localStorage.setItem('sundayReset', JSON.stringify(data));
+
+            const msg = document.getElementById('savedMsg');
+            msg.classList.add('show');
+            setTimeout(() => msg.classList.remove('show'), 3000);
+
+            // Also copy as JSON for easy backup/import
+            console.log('Reset data:', JSON.stringify(data, null, 2));
+        }
+
+        function clearForm() {
+            if (confirm('Clear all fields? You can always reload your last save.')) {
+                document.getElementById('resetForm').reset();
+            }
+        }
+
+        // Load on startup
+        loadReset();
+    </script>
+</body>
+</html>
