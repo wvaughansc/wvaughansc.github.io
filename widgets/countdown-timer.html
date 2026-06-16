@@ -73,23 +73,21 @@
 <div id="grid"></div>
 
 <script>
-const NOTION_TOKEN = "YOUR_NOTION_TOKEN";
-const DATABASE_ID = "YOUR_DATABASE_ID";
-const DATE_PROPERTY = "Date"; // change if needed
+const API_URL = "https://wvaughansc-github-io.vercel.app/api/notion";
 
 async function fetchNotion() {
     try {
-        const res = await fetch("https://wvaughansc-github-io.vercel.app/api/notion");
+        const res = await fetch(API_URL);
 
-        console.log("STATUS:", res.status);
+        if (!res.ok) {
+            throw new Error(`HTTP ${res.status}`);
+        }
 
-        const text = await res.text();
-        console.log("RAW RESPONSE:", text);
-
-        return JSON.parse(text).results || [];
+        const data = await res.json();
+        return data.results || [];
 
     } catch (err) {
-        console.error("FETCH FAILED:", err);
+        console.error("Fetch failed:", err);
         return [];
     }
 }
@@ -99,64 +97,78 @@ function getTitle(page) {
         p => p.type === "title"
     );
 
-    const text = titleProp?.title?.map(t => t.plain_text).join("");
+    const text = titleProp?.title
+        ?.map(t => t.plain_text)
+        .join("");
 
-    return text && text.trim().length > 0 ? text : "Untitled Project";
+    return text?.trim() || "Untitled Project";
 }
 
 function getDate(page) {
-    const date = page.properties?.Date?.date?.start;
-    return date ? new Date(date) : null;
+    const dateString = page.properties?.Date?.date?.start;
+
+    if (!dateString) return null;
+
+    const date = new Date(dateString);
+
+    return isNaN(date.getTime()) ? null : date;
 }
 
 function sortByDeadline(items) {
-    return items.sort((a, b) => {
+    return [...items].sort((a, b) => {
         const aDate = getDate(a);
         const bDate = getDate(b);
 
-        if (!aDate && !bDate) return 0;
-        if (!aDate) return 1;
-        if (!bDate) return -1;
+        const aTime = aDate ? aDate.getTime() : Number.MAX_SAFE_INTEGER;
+        const bTime = bDate ? bDate.getTime() : Number.MAX_SAFE_INTEGER;
 
-        return aDate - bDate; // closest first
+        return aTime - bTime;
     });
 }
-    
+
 function formatCountdown(target) {
-    if (!target) return "— NO DATE —";
+    if (!target) return "NO DATE";
 
     const now = new Date();
-    const diff = target - now;
+    const diff = target.getTime() - now.getTime();
 
-    if (isNaN(diff)) return "— INVALID —";
+    if (diff <= 0) {
+        const overdue = Math.abs(diff);
 
-    if (diff <= 0) return "⛔ DUE";
+        const days = Math.floor(overdue / 86400000);
+        const hours = Math.floor((overdue % 86400000) / 3600000);
 
-    const s = Math.floor(diff / 1000);
-    const d = Math.floor(s / 86400);
-    const h = Math.floor((s % 86400) / 3600);
-    const m = Math.floor((s % 3600) / 60);
-    const sec = s % 60;
+        return `OVERDUE ${days}d ${hours}h`;
+    }
 
-    return `${d}d ${h}h ${m}m ${sec}s`;
+    const totalSeconds = Math.floor(diff / 1000);
+
+    const days = Math.floor(totalSeconds / 86400);
+    const hours = Math.floor((totalSeconds % 86400) / 3600);
+    const minutes = Math.floor((totalSeconds % 3600) / 60);
+    const seconds = totalSeconds % 60;
+
+    return `${days}d ${hours}h ${minutes}m ${seconds}s`;
 }
-status.innerText = "fetching Notion...";
+
 async function render() {
-    const items = await fetchNotion();
     const grid = document.getElementById("grid");
     const status = document.getElementById("status");
 
-status.innerText = "❌ API failed (check console)";
-    
+    status.innerText = "Loading...";
+
+    const items = await fetchNotion();
+
     grid.innerHTML = "";
+
+    if (!items.length) {
+        status.innerText = "0 projects";
+        return;
+    }
 
     const sorted = sortByDeadline(items);
 
-   if (!sorted.length) {
-    status.innerText = "⚠️ No data loaded (check API)";
-} else {
     status.innerText = `${sorted.length} projects`;
-}
 
     sorted.forEach(page => {
         const title = getTitle(page);
@@ -167,21 +179,23 @@ status.innerText = "❌ API failed (check console)";
 
         tile.innerHTML = `
             <div class="title">${title}</div>
-            <div class="date">${date ? date.toDateString() : "No date set"}</div>
+            <div class="date">
+                ${date ? date.toLocaleDateString() : "No date set"}
+            </div>
             <div class="countdown"></div>
             <div class="label">COUNTDOWN</div>
         `;
 
-        grid.appendChild(tile);
+        const countdownEl = tile.querySelector(".countdown");
 
-        const el = tile.querySelector(".countdown");
-
-        function update() {
-            el.innerText = formatCountdown(date);
+        function updateCountdown() {
+            countdownEl.textContent = formatCountdown(date);
         }
 
-        update();
-        setInterval(update, 1000);
+        updateCountdown();
+        setInterval(updateCountdown, 1000);
+
+        grid.appendChild(tile);
     });
 }
 
