@@ -37,6 +37,43 @@
         min-height: 90px;
     }
 
+    .tile.overdue {
+    border-color: #ef4444;
+    box-shadow: 0 0 20px rgba(239,68,68,.35);
+}
+
+.tile.soon {
+    border-color: #f97316;
+    box-shadow: 0 0 20px rgba(249,115,22,.35);
+}
+
+.tile.future {
+    border-color: #22c55e;
+    box-shadow: 0 0 20px rgba(34,197,94,.35);
+}
+
+.tile.nodate {
+    opacity: 0.45;
+    border-color: #4b5563;
+    box-shadow: none;
+}
+
+.countdown.overdue {
+    color: #ef4444;
+}
+
+.countdown.soon {
+    color: #f97316;
+}
+
+.countdown.future {
+    color: #22c55e;
+}
+
+.countdown.nodate {
+    color: #6b7280;
+}
+
     .title {
         font-size: 14px;
         color: #ffffff;
@@ -155,6 +192,25 @@ function formatCountdown(target) {
     return `${days}d ${hours}h ${minutes}m ${seconds}s`;
 }
 
+    function getDeadlineClass(date) {
+    if (!date) return "nodate";
+
+    const now = new Date();
+    const diff = date.getTime() - now.getTime();
+
+    if (diff <= 0) {
+        return "overdue";
+    }
+
+    const daysRemaining = diff / (1000 * 60 * 60 * 24);
+
+    if (daysRemaining <= 7) {
+        return "soon";
+    }
+
+    return "future";
+}
+
 async function render() {
     const grid = document.getElementById("grid");
     const status = document.getElementById("status");
@@ -181,7 +237,10 @@ async function render() {
         const date = getDate(page);
 
         const tile = document.createElement("div");
-        tile.className = "tile";
+        
+        const deadlineClass = getDeadlineClass(date);
+        
+        tile.className = `tile ${deadlineClass}`;
 
         tile.innerHTML = `
             <div class="title">${title}</div>
@@ -193,6 +252,7 @@ async function render() {
         `;
 
         const countdownEl = tile.querySelector(".countdown");
+        countdownEl.classList.add(deadlineClass);
 
         function updateCountdown() {
             countdownEl.textContent = formatCountdown(date);
