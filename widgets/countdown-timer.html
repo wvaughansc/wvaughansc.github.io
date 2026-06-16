@@ -140,17 +140,23 @@ function formatCountdown(target) {
 
     return `${d}d ${h}h ${m}m ${sec}s`;
 }
-
+status.innerText = "fetching Notion...";
 async function render() {
     const items = await fetchNotion();
     const grid = document.getElementById("grid");
     const status = document.getElementById("status");
 
+status.innerText = "❌ API failed (check console)";
+    
     grid.innerHTML = "";
 
     const sorted = sortByDeadline(items);
 
-   status.innerText = `${sorted.length} projects`;
+   if (!sorted.length) {
+    status.innerText = "⚠️ No data loaded (check API)";
+} else {
+    status.innerText = `${sorted.length} projects`;
+}
 
     sorted.forEach(page => {
         const title = getTitle(page);
