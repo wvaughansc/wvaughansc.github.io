@@ -220,15 +220,26 @@
                     'Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'
                 ];
 
+                const today = new Date();
+                today.setHours(0, 0, 0, 0);
+
                 const forecastHTML = data.daily.time.map((date, index) => {
                     const forecastWeather =
                         weatherCodes[data.daily.weather_code[index]] ||
                         { emoji: '🌡️' };
 
-                    const day =
-                        index === 0
-                            ? 'Today'
-                            : dayNames[new Date(date).getDay()];
+                    const forecastDate = new Date(date + 'T00:00:00');
+                    forecastDate.setHours(0, 0, 0, 0);
+                    const dayOffset = Math.round((forecastDate - today) / (1000 * 60 * 60 * 24));
+
+                    let day;
+                    if (dayOffset === 0) {
+                        day = 'Today';
+                    } else if (dayOffset === 1) {
+                        day = 'Tomorrow';
+                    } else {
+                        day = dayNames[forecastDate.getDay()];
+                    }
 
                     return `
                         <div class="forecast-day">
