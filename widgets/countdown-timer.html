@@ -88,13 +88,17 @@ function getTitle(page) {
 }
 
 function getDate(page) {
-    const d = page.properties[DATE_PROPERTY]?.date?.start;
+    const d = page.properties?.Date?.date?.start;
     return d ? new Date(d) : null;
 }
 
 function formatCountdown(target) {
+    if (!target) return "— NO DATE —";
+
     const now = new Date();
     const diff = target - now;
+
+    if (isNaN(diff)) return "— INVALID —";
 
     if (diff <= 0) return "⛔ DUE";
 
@@ -114,35 +118,35 @@ async function render() {
 
     grid.innerHTML = "";
 
-    const valid = items.filter(p => getDate(p));
+    const valid = items;
 
     status.innerText = `${valid.length} active projects`;
 
-    valid.forEach(page => {
-        const title = getTitle(page);
-        const date = getDate(page);
+items.forEach(page => {
+    const title = getTitle(page);
+    const date = getDate(page);
 
-        const tile = document.createElement("div");
-        tile.className = "tile";
+    const tile = document.createElement("div");
+    tile.className = "tile";
 
-        tile.innerHTML = `
-            <div class="title">${title}</div>
-            <div class="date">${date.toDateString()}</div>
-            <div class="countdown" id="cd-${page.id}"></div>
-            <div class="label">COUNTDOWN</div>
-        `;
+    tile.innerHTML = `
+        <div class="title">${title}</div>
+        <div class="date">${date ? date.toDateString() : "No date set"}</div>
+        <div class="countdown"></div>
+        <div class="label">COUNTDOWN</div>
+    `;
 
-        grid.appendChild(tile);
+    grid.appendChild(tile);
 
-        const el = tile.querySelector(".countdown");
+    const el = tile.querySelector(".countdown");
 
-        function update() {
-            el.innerText = formatCountdown(date);
-        }
+    function update() {
+        el.innerText = formatCountdown(date);
+    }
 
-        update();
-        setInterval(update, 1000);
-    });
+    update();
+    setInterval(update, 1000);
+});
 }
 
 render();
