@@ -78,9 +78,20 @@ const DATABASE_ID = "YOUR_DATABASE_ID";
 const DATE_PROPERTY = "Date"; // change if needed
 
 async function fetchNotion() {
-    const res = await fetch("https://wvaughansc-github-io.vercel.app/api/notion");
-    const data = await res.json();
-    return data.results || [];
+    try {
+        const res = await fetch("https://wvaughansc-github-io.vercel.app/api/notion");
+
+        console.log("STATUS:", res.status);
+
+        const text = await res.text();
+        console.log("RAW RESPONSE:", text);
+
+        return JSON.parse(text).results || [];
+
+    } catch (err) {
+        console.error("FETCH FAILED:", err);
+        return [];
+    }
 }
 
 function getTitle(page) {
@@ -139,7 +150,7 @@ async function render() {
 
     const sorted = sortByDeadline(items);
 
-    status.innerText = `${sorted.length} projects`;
+   status.innerText = `${sorted.length} projects`;
 
     sorted.forEach(page => {
         const title = getTitle(page);
