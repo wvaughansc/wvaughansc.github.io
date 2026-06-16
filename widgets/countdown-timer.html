@@ -114,6 +114,10 @@ function getDate(page) {
     return isNaN(date.getTime()) ? null : date;
 }
 
+function isDone(page) {
+    return page.properties?.Status?.select?.name === "Done";
+}
+
 function sortByDeadline(items) {
     return [...items].sort((a, b) => {
         const aDate = getDate(a);
@@ -161,14 +165,16 @@ async function render() {
 
     grid.innerHTML = "";
 
-    if (!items.length) {
-        status.innerText = "0 projects";
+    const activeProjects = items.filter(page => !isDone(page));
+
+    if (!activeProjects.length) {
+        status.innerText = "0 active projects";
         return;
     }
 
-    const sorted = sortByDeadline(items);
+    const sorted = sortByDeadline(activeProjects);
 
-    status.innerText = `${sorted.length} projects`;
+    status.innerText = `${sorted.length} active projects`;
 
     sorted.forEach(page => {
         const title = getTitle(page);
