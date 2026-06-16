@@ -34,6 +34,7 @@
         padding: 12px;
         border-radius: 6px;
         box-shadow: 0 0 12px rgba(0,255,153,0.05);
+        min-height: 90px;
     }
 
     .title {
@@ -83,15 +84,33 @@ async function fetchNotion() {
 }
 
 function getTitle(page) {
-    const prop = Object.values(page.properties).find(p => p.type === "title");
-    return prop?.title?.[0]?.plain_text || "Untitled";
+    const titleProp = Object.values(page.properties).find(
+        p => p.type === "title"
+    );
+
+    const text = titleProp?.title?.map(t => t.plain_text).join("");
+
+    return text && text.trim().length > 0 ? text : "Untitled Project";
 }
 
 function getDate(page) {
-    const d = page.properties?.Date?.date?.start;
-    return d ? new Date(d) : null;
+    const date = page.properties?.Date?.date?.start;
+    return date ? new Date(date) : null;
 }
 
+function sortByDeadline(items) {
+    return items.sort((a, b) => {
+        const aDate = getDate(a);
+        const bDate = getDate(b);
+
+        if (!aDate && !bDate) return 0;
+        if (!aDate) return 1;
+        if (!bDate) return -1;
+
+        return aDate - bDate; // closest first
+    });
+}
+    
 function formatCountdown(target) {
     if (!target) return "— NO DATE —";
 
@@ -118,35 +137,35 @@ async function render() {
 
     grid.innerHTML = "";
 
-    const valid = items;
+    const sorted = sortByDeadline(items);
 
-    status.innerText = `${valid.length} active projects`;
+    status.innerText = `${sorted.length} projects`;
 
-items.forEach(page => {
-    const title = getTitle(page);
-    const date = getDate(page);
+    sorted.forEach(page => {
+        const title = getTitle(page);
+        const date = getDate(page);
 
-    const tile = document.createElement("div");
-    tile.className = "tile";
+        const tile = document.createElement("div");
+        tile.className = "tile";
 
-    tile.innerHTML = `
-        <div class="title">${title}</div>
-        <div class="date">${date ? date.toDateString() : "No date set"}</div>
-        <div class="countdown"></div>
-        <div class="label">COUNTDOWN</div>
-    `;
+        tile.innerHTML = `
+            <div class="title">${title}</div>
+            <div class="date">${date ? date.toDateString() : "No date set"}</div>
+            <div class="countdown"></div>
+            <div class="label">COUNTDOWN</div>
+        `;
 
-    grid.appendChild(tile);
+        grid.appendChild(tile);
 
-    const el = tile.querySelector(".countdown");
+        const el = tile.querySelector(".countdown");
 
-    function update() {
-        el.innerText = formatCountdown(date);
-    }
+        function update() {
+            el.innerText = formatCountdown(date);
+        }
 
-    update();
-    setInterval(update, 1000);
-});
+        update();
+        setInterval(update, 1000);
+    });
 }
 
 render();
