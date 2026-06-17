@@ -284,6 +284,19 @@ function getMoonName(phase) {
 function getNextHoliday() {
     const today = new Date();
 
+    const dayOfYear = getDayOfYear(today);
+
+const daysInYear =
+    ((today.getFullYear() % 4 === 0 &&
+      today.getFullYear() % 100 !== 0) ||
+      today.getFullYear() % 400 === 0)
+        ? 366
+        : 365;
+
+const yearPercent =
+    ((dayOfYear / daysInYear) * 100)
+        .toFixed(1);
+    
     const year = today.getFullYear();
 
     const holidays = [
@@ -356,10 +369,30 @@ async function getSnapshot() {
 
                 <div class="header-section">
 
-                    <div class="day-counter">
-                        <h1>Today is Day ${getDayOfYear(today)} of ${today.getFullYear()}</h1>
-                        <p>${holidayText}</p>
-                    </div>
+<div class="day-counter">
+    <h1>
+        Today is Day ${dayOfYear}
+        of ${today.getFullYear()}
+    </h1>
+
+    <p>${holidayText}</p>
+
+    <div class="year-progress">
+
+        <div class="progress-label">
+            <span>Year Progress</span>
+            <span>${yearPercent}%</span>
+        </div>
+
+        <div class="progress-bar">
+            <div
+                class="progress-fill"
+                style="width:${yearPercent}%"
+            ></div>
+        </div>
+
+    </div>
+</div>
 
                     <div class="right-panel">
 
