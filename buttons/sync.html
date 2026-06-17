@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <style>
+    body { margin: 0; display: flex; justify-content: center; align-items: center; height: 100vh; background: transparent; }
+    button {
+      padding: 10px 20px;
+      font-family: sans-serif;
+      font-weight: 600;
+      color: white;
+      background-color: #2eaadc;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    button:hover { background-color: #0077b6; }
+    button:disabled { background-color: #ccc; }
+  </style>
+</head>
+<body>
+  <button id="syncBtn" onclick="runSync()">Sync Now</button>
+
+  <script>
+    async function runSync() {
+      const btn = document.getElementById('syncBtn');
+      btn.disabled = true;
+      btn.innerText = 'Syncing...';
+      
+      try {
+        await fetch('https://script.google.com/macros/s/AKfycbzWHTYswzhbQX2VCyLuO64sP9wx9jE9yLWkOFiZypBagCiXlIZv2aR8HuyzZHyOHf2spA/exec', {
+          method: 'POST',
+          mode: 'no-cors' // Google Script responses often require this
+        });
+        btn.innerText = 'Sync Complete!';
+      } catch (e) {
+        btn.innerText = 'Error';
+      }
+      
+      setTimeout(() => { btn.disabled = false; btn.innerText = 'Sync Now'; }, 3000);
+    }
+  </script>
+</body>
+</html>
