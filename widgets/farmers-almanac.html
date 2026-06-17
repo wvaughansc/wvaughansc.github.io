@@ -1,152 +1,281 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <link href="https://fonts.googleapis.com/css2?family=Merriweather:wght@300;400;700&family=Caveat:wght@500&display=swap" rel="stylesheet">
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Farmers Almanac Snapshot</title>
-<style>
-*{margin:0;padding:0;box-sizing:border-box}
-body{background:transparent;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color: #4b3621;}
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Farmers Almanac Snapshot</title>
+  <link href="https://fonts.googleapis.com/css2?family=Merriweather:wght@300;400;700&family=Caveat:wght@500&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      background: #f7f1e3;
       font-family: 'Merriweather', serif;
-.snapshot-wrapper{background:
-linear-gradient(
-    transparent 31px,
-    rgba(0,0,0,.05) 32px
-),
-#f7f1e3;
-
-background-size: 100% 32px;
-
-box-shadow:
-0 4px 12px rgba(0,0,0,.08);}
-.header-section{display:flex;justify-content:space-between;align-items:flex-start;gap:2rem;flex-wrap:wrap}
-.day-counter h1{font-size:28px;font-weight:500;margin-bottom:.5rem}
-.day-counter p{font-size:14px;color:#718096}
-.year-progress{margin-top:.8rem;max-width:320px}
-.progress-label{display:flex;justify-content:space-between;font-size:12px;color:#718096;margin-bottom:.35rem}
-.progress-bar{height:8px;background:#edf2f7;border-radius:999px;overflow:hidden}
-.progress-fill{height:100%;background:
-linear-gradient(
-90deg,
-#8b5e3c,
-#b08968
-);}
-.right-panel{flex:1;display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:1rem}
-.info-label{font-size:12px;color:#718096;text-transform:uppercase}
-.info-value{font-size:16px;font-weight:500}
-.divider{height:1px;background:
-repeating-linear-gradient(
-90deg,
-#8b7355,
-#8b7355 8px,
-transparent 8px,
-transparent 16px
-);;margin:1.5rem 0}
-.moon-card {
-    background: #fef8e7;
-    border: 1px solid #d6c6a5;
-}
-.stat-card,.forecast-day{background:#f7fafc;border-radius:10px}
-.moon-card{text-align:center;padding:1rem}
-.moon-emoji{font-size:40px}
-.weather-summary{display:flex;gap:1rem;align-items:center}
-.weather-icon{font-size:36px}
-.weather-temp{font-size:18px;font-weight:600}
-.quick-stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:1rem}
-.stat-card{padding:1rem}
-.stat-title{font-size:12px;color:#718096;text-transform:uppercase}
-.stat-value{font-size:20px;font-weight:600}
-.forecast-title{font-size:14px;font-weight:600;margin-bottom:.75rem}
-.forecast-scroll{display:flex;gap:.75rem;overflow-x:auto;padding-bottom:.5rem}
-.forecast-day {
-    background: #fffaf0;
-    border: 1px solid #d6c6a5;
-    box-shadow:
-        2px 2px 4px rgba(0,0,0,.08);
-}
-.loading,.error{text-align:center;padding:1rem}
-    .info-label,
-.stat-title,
-.forecast-title {
-    font-family: 'Caveat', cursive;
-    font-size: 16px;
-}
+      color: #4b3621;
+    }
+    .snapshot-wrapper {
+      background: linear-gradient(transparent 31px, rgba(0,0,0,.05) 32px), #f7f1e3;
+      background-size: 100% 32px;
+      box-shadow: 0 4px 12px rgba(0,0,0,.08);
+      padding: 1.5rem;
+    }
+    .header-section {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 2rem;
+      flex-wrap: wrap;
+    }
+    .day-counter h1 {
+      font-size: 28px;
+      font-weight: 500;
+      margin-bottom: .5rem;
+    }
+    .day-counter p {
+      font-size: 14px;
+      color: #718096;
+    }
+    .year-progress {
+      margin-top: .8rem;
+      max-width: 320px;
+    }
+    .progress-label {
+      display: flex;
+      justify-content: space-between;
+      font-size: 12px;
+      color: #718096;
+      margin-bottom: .35rem;
+    }
+    .progress-bar {
+      height: 8px;
+      background: #edf2f7;
+      border-radius: 999px;
+      overflow: hidden;
+    }
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #8b5e3c, #b08968);
+    }
+    .right-panel {
+      flex: 1;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 1rem;
+    }
+    .info-label {
+      font-size: 16px;
+      color: #718096;
+      text-transform: uppercase;
+      font-family: 'Caveat', cursive;
+    }
+    .info-value {
+      font-size: 16px;
+      font-weight: 500;
+    }
+    .divider {
+      height: 1px;
+      background: repeating-linear-gradient(90deg, #8b7355, #8b7355 8px, transparent 8px, transparent 16px);
+      margin: 1.5rem 0;
+    }
+    .moon-card {
+      background: #fef8e7;
+      border: 1px solid #d6c6a5;
+      border-radius: 10px;
+      text-align: center;
+      padding: 1rem;
+    }
+    .moon-emoji {
+      font-size: 40px;
+    }
+    .weather-summary {
+      display: flex;
+      gap: 1rem;
+      align-items: center;
+    }
+    .weather-icon {
+      font-size: 36px;
+    }
+    .weather-temp {
+      font-size: 18px;
+      font-weight: 600;
+    }
+    .quick-stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 1rem;
+    }
+    .stat-card {
+      background: #fffaf0;
+      border: 1px solid #d6c6a5;
+      border-radius: 10px;
+      padding: 1rem;
+    }
+    .stat-title {
+      font-size: 16px;
+      color: #718096;
+      text-transform: uppercase;
+      font-family: 'Caveat', cursive;
+    }
+    .stat-value {
+      font-size: 20px;
+      font-weight: 600;
+    }
+    .forecast-title {
+      font-size: 16px;
+      font-weight: 600;
+      margin-bottom: .75rem;
+      font-family: 'Caveat', cursive;
+    }
+    .forecast-scroll {
+      display: flex;
+      gap: .75rem;
+      overflow-x: auto;
+      padding-bottom: .5rem;
+    }
+    .forecast-day {
+      background: #fffaf0;
+      border: 1px solid #d6c6a5;
+      box-shadow: 2px 2px 4px rgba(0,0,0,.08);
+      border-radius: 10px;
+      padding: .75rem;
+      text-align: center;
+      min-width: 70px;
+    }
+    .loading, .error {
+      text-align: center;
+      padding: 1rem;
+    }
     .almanac-header {
-    text-align: center;
-    font-size: 28px;
-    font-weight: 700;
-    margin-bottom: 1rem;
-    color: #5c4033;
-    border-bottom: 2px solid #8b7355;
-    padding-bottom: .75rem;
-}
-@media(max-width:600px){.header-section{flex-direction:column}}
+      text-align: center;
+      font-size: 28px;
+      font-weight: 700;
+      margin-bottom: 1rem;
+      color: #5c4033;
+      border-bottom: 2px solid #8b7355;
+      padding-bottom: .75rem;
+      padding-top: 1rem;
+    }
     .almanac-footer {
-    margin-top: 1rem;
-    text-align: center;
-    font-size: 12px;
-    color: #7b6a58;
-    font-style: italic;
-}
-</style>
+      margin-top: 1rem;
+      text-align: center;
+      font-size: 12px;
+      color: #7b6a58;
+      font-style: italic;
+      padding-bottom: 1rem;
+    }
+    @media (max-width: 600px) {
+      .header-section {
+        flex-direction: column;
+      }
+    }
+  </style>
 </head>
 <body>
-<div id="snapshotWidget"><div class="snapshot-wrapper"><div class="loading">Loading...</div></div></div>
-    <div class="almanac-header">
-    The Vaughan Family Almanac
-</div>
-<script>
-const latitude=34.891152,longitude=-82.308002;
-const doy=d=>Math.floor((d-new Date(d.getFullYear(),0,0))/86400000);
-const time=d=>new Date(d).toLocaleTimeString([], {hour:'numeric',minute:'2-digit'});
-function icon(c){if(c==0)return'☀️';if([1,2].includes(c))return'🌤️';if(c==3)return'☁️';if([45,48].includes(c))return'🌫️';if([95,96,99].includes(c))return'⛈️';if([71,73,75,77,85,86].includes(c))return'❄️';return'🌧️'}
-function moonPhase(){const n=new Date(),k=new Date('2000-01-06T18:14:00Z');return (((n-k)/86400000)%29.53058867)/29.53058867*100}
-function moonEmoji(p){if(p<6.25||p>=93.75)return'🌑';if(p<18.75)return'🌒';if(p<31.25)return'🌓';if(p<43.75)return'🌔';if(p<56.25)return'🌕';if(p<68.75)return'🌖';if(p<81.25)return'🌗';return'🌘'}
-async function getSnapshot(){
- try{
- const today=new Date(),day=doy(today),daysInYear=((today.getFullYear()%4===0&&today.getFullYear()%100!==0)||today.getFullYear()%400===0)?366:365;
- const yearPercent=((day/daysInYear)*100).toFixed(1);
- const r=await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current=temperature_2m,weather_code&daily=sunrise,sunset,temperature_2m_max,temperature_2m_min,weather_code&temperature_unit=fahrenheit&forecast_days=16&timezone=auto`);
- const data=await r.json();
- let forecast='';
- data.daily.time.forEach((t,i)=>{
-  forecast+=`<div class="forecast-day"><div>${new Date(t).toLocaleDateString('en-US',{weekday:'short'})}</div><div>${icon(data.daily.weather_code[i])}</div><div><b>${Math.round(data.daily.temperature_2m_max[i])}°</b></div><div>${Math.round(data.daily.temperature_2m_min[i])}°</div></div>`;
- });
- const mp=moonPhase(), me=moonEmoji(mp);
- document.getElementById('snapshotWidget').innerHTML=`
- <div class="snapshot-wrapper">
- <div class="header-section">
- <div class="day-counter">
- <h1>Day ${day} of ${today.getFullYear()}</h1>
- <p>${daysInYear-day} days remaining</p>
- <div class="year-progress"><div class="progress-label"><span>Year Progress</span><span>${yearPercent}%</span></div><div class="progress-bar"><div class="progress-fill" style="width:${yearPercent}%"></div></div></div>
- </div>
- <div class="right-panel">
- <div><div class="info-label">Sunrise</div><div class="info-value">${time(data.daily.sunrise[0])}</div></div>
- <div><div class="info-label">Sunset</div><div class="info-value">${time(data.daily.sunset[0])}</div></div>
- <div><div class="info-label">Moon</div><div class="info-value">${me}</div></div>
- <div><div class="info-label">Temp</div><div class="info-value">${Math.round(data.current.temperature_2m)}°F</div></div>
- </div></div>
- <div class="divider"></div>
- <div class="moon-card"><div class="moon-emoji">${me}</div></div>
- <div class="divider"></div>
- <div class="weather-summary"><div class="weather-icon">${icon(data.current.weather_code)}</div><div class="weather-temp">${Math.round(data.current.temperature_2m)}°F</div></div>
- <div class="divider"></div>
- <div class="quick-stats">
- <div class="stat-card"><div class="stat-title">Week</div><div class="stat-value">${Math.ceil(day/7)}/52</div></div>
- <div class="stat-card"><div class="stat-title">Year Remaining</div><div class="stat-value">${daysInYear-day}</div></div>
- </div>
- <div class="divider"></div>
- <div class="forecast-title">16-Day Forecast</div>
- <div class="forecast-scroll">${forecast}</div>
- </div>`;
- }catch(e){document.getElementById('snapshotWidget').innerHTML='<div class="snapshot-wrapper"><div class="error">Unable to load snapshot.</div></div>'}
-}
-getSnapshot();setInterval(getSnapshot,3600000);
-</script>
-    <div class="almanac-footer">
-Updated hourly • Taylors, South Carolina
-</div>
+  <div class="almanac-header">The Vaughan Family Almanac</div>
+  <div id="snapshotWidget">
+    <div class="snapshot-wrapper">
+      <div class="loading">Loading...</div>
+    </div>
+  </div>
+  <div class="almanac-footer">Updated hourly &bull; Taylors, South Carolina</div>
+
+  <script>
+    const latitude = 34.891152, longitude = -82.308002;
+    const doy = d => Math.floor((d - new Date(d.getFullYear(), 0, 0)) / 86400000);
+    const time = d => new Date(d).toLocaleTimeString([], {hour: 'numeric', minute: '2-digit'});
+
+    function icon(c) {
+      if (c == 0) return '☀️';
+      if ([1, 2].includes(c)) return '🌤️';
+      if (c == 3) return '☁️';
+      if ([45, 48].includes(c)) return '🌫️';
+      if ([95, 96, 99].includes(c)) return '⛈️';
+      if ([71, 73, 75, 77, 85, 86].includes(c)) return '❄️';
+      return '🌧️';
+    }
+
+    function moonPhase() {
+      const n = new Date(), k = new Date('2000-01-06T18:14:00Z');
+      return (((n - k) / 86400000) % 29.53058867) / 29.53058867 * 100;
+    }
+
+    function moonEmoji(p) {
+      if (p < 6.25 || p >= 93.75) return '🌑';
+      if (p < 18.75) return '🌒';
+      if (p < 31.25) return '🌓';
+      if (p < 43.75) return '🌔';
+      if (p < 56.25) return '🌕';
+      if (p < 68.75) return '🌖';
+      if (p < 81.25) return '🌗';
+      return '🌘';
+    }
+
+    async function getSnapshot() {
+      try {
+        const today = new Date(),
+              day = doy(today),
+              daysInYear = ((today.getFullYear() % 4 === 0 && today.getFullYear() % 100 !== 0) || today.getFullYear() % 400 === 0) ? 366 : 365;
+        const yearPercent = ((day / daysInYear) * 100).toFixed(1);
+
+        const r = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current=temperature_2m,weather_code&daily=sunrise,sunset,temperature_2m_max,temperature_2m_min,weather_code&temperature_unit=fahrenheit&forecast_days=16&timezone=auto`);
+        const data = await r.json();
+
+        let forecast = '';
+        data.daily.time.forEach((t, i) => {
+          forecast += `<div class="forecast-day">
+            <div>${new Date(t).toLocaleDateString('en-US', {weekday: 'short'})}</div>
+            <div>${icon(data.daily.weather_code[i])}</div>
+            <div><b>${Math.round(data.daily.temperature_2m_max[i])}°</b></div>
+            <div>${Math.round(data.daily.temperature_2m_min[i])}°</div>
+          </div>`;
+        });
+
+        const mp = moonPhase(), me = moonEmoji(mp);
+
+        document.getElementById('snapshotWidget').innerHTML = `
+          <div class="snapshot-wrapper">
+            <div class="header-section">
+              <div class="day-counter">
+                <h1>Day ${day} of ${today.getFullYear()}</h1>
+                <p>${daysInYear - day} days remaining</p>
+                <div class="year-progress">
+                  <div class="progress-label"><span>Year Progress</span><span>${yearPercent}%</span></div>
+                  <div class="progress-bar"><div class="progress-fill" style="width:${yearPercent}%"></div></div>
+                </div>
+              </div>
+              <div class="right-panel">
+                <div><div class="info-label">Sunrise</div><div class="info-value">${time(data.daily.sunrise[0])}</div></div>
+                <div><div class="info-label">Sunset</div><div class="info-value">${time(data.daily.sunset[0])}</div></div>
+                <div><div class="info-label">Moon</div><div class="info-value">${me}</div></div>
+                <div><div class="info-label">Temp</div><div class="info-value">${Math.round(data.current.temperature_2m)}°F</div></div>
+              </div>
+            </div>
+            <div class="divider"></div>
+            <div class="moon-card"><div class="moon-emoji">${me}</div></div>
+            <div class="divider"></div>
+            <div class="weather-summary">
+              <div class="weather-icon">${icon(data.current.weather_code)}</div>
+              <div class="weather-temp">${Math.round(data.current.temperature_2m)}°F</div>
+            </div>
+            <div class="divider"></div>
+            <div class="quick-stats">
+              <div class="stat-card"><div class="stat-title">Week</div><div class="stat-value">${Math.ceil(day / 7)}/52</div></div>
+              <div class="stat-card"><div class="stat-title">Year Remaining</div><div class="stat-value">${daysInYear - day}</div></div>
+            </div>
+            <div class="divider"></div>
+            <div class="forecast-title">16-Day Forecast</div>
+            <div class="forecast-scroll">${forecast}</div>
+          </div>`;
+      } catch (e) {
+        document.getElementById('snapshotWidget').innerHTML = '<div class="snapshot-wrapper"><div class="error">Unable to load snapshot.</div></div>';
+      }
+    }
+
+    getSnapshot();
+    setInterval(getSnapshot, 3600000);
+  </script>
 </body>
 </html>
