@@ -4,6 +4,9 @@ export default async function handler(req, res) {
   const DONE_PROPERTY = process.env.DONE_PROPERTY || "Done";
   const SKIPPED_PROPERTY = process.env.SKIPPED_PROPERTY || "Skipped";
 
+  console.log("API Key Exists:", !!NOTION_API_KEY);
+  console.log("API Key Prefix:", NOTION_API_KEY?.substring(0, 8));
+  
   try {
     let allResults = [];
     let cursor = undefined;
