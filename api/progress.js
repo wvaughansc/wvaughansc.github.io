@@ -1,4 +1,14 @@
 export default async function handler(req, res) {
+  // Allow GitHub Pages to access this API
+  res.setHeader('Access-Control-Allow-Origin', 'https://wvaughansc.github.io');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+
+  // Handle preflight request (IMPORTANT)
+  if (req.method === 'OPTIONS') {
+    return res.status(200).end();
+  }
+  
   const NOTION_API_KEY = process.env.NOTION_TOKEN;
   const DATABASE_ID = process.env.STEPS_DATABASE_ID;
   const DONE_PROPERTY = process.env.DONE_PROPERTY || "Done";
