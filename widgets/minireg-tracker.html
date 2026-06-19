@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Mini Regression Automation Progress</title>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 
     <script>
   let chart = null;
@@ -463,20 +463,9 @@
       <button id="refreshBtn" onclick="fetchProgress()">↺ refresh</button>
     </div>
   </div>
+  </div>
 
   <script>
-    // ─────────────────────────────────────────────
-    //  CONFIG — fill these in before pushing to GitHub
-    // ─────────────────────────────────────────────
-    const NOTION_API_KEY   = "YOUR_NOTION_API_KEY_HERE";
-    const DATABASE_ID      = "YOUR_DATABASE_ID_HERE";
-    const DONE_PROPERTY    = "Done";      // exact name of your Done checkbox property
-    const SKIPPED_PROPERTY = "Skipped";   // exact name of your Skipped checkbox property
-    // ─────────────────────────────────────────────
-
-    const CORS_PROXY = "https://corsproxy.io/?";
-    const NOTION_VER = "2022-06-28";
-
     let chart = null;
 
     function setStatus(msg, isError = false) {
@@ -485,123 +474,140 @@
       el.className = isError ? 'error' : '';
     }
 
-    async function queryAllPages() {
-      let allResults = [];
-      let cursor = undefined;
+    function renderChart({
+      total,
+      done,
+      skipped,
+      remaining,
+      executionPct,
+      completionPct
+    }) {
 
-      do {
-        const body = { page_size: 100 };
-        if (cursor) body.start_cursor = cursor;
+      remaining ??= Math.max(0, total - done - skipped);
 
-        const url = `${CORS_PROXY}https://api.notion.com/v1/databases/${DATABASE_ID}/query`;
-        const res = await fetch(url, {
-          method: "POST",
-          headers: {
-            "Authorization": `Bearer ${NOTION_API_KEY}`,
-            "Notion-Version": NOTION_VER,
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify(body)
-        });
+      executionPct ??=
+        total > 0
+          ? Math.round((done / total) * 100)
+          : 0;
 
-        if (!res.ok) {
-          const err = await res.json().catch(() => ({}));
-          throw new Error(err?.message || `Notion API error ${res.status}`);
-        }
+      completionPct ??=
+        total > 0
+          ? Math.round(((done + skipped) / total) * 100)
+          : 0;
 
-        const data = await res.json();
-        allResults = allResults.concat(data.results || []);
-        cursor = data.has_more ? data.next_cursor : undefined;
+      document.getElementById('pctDisplay').textContent =
+        completionPct + '%';
 
-      } while (cursor);
+      document.getElementById('legDone').textContent = done;
+      document.getElementById('legSkip').textContent = skipped;
+      document.getElementById('legRem').textContent = remaining;
 
-      return allResults;
-    }
-
-    function countResults(pages) {
-      let done = 0, skipped = 0;
-      for (const page of pages) {
-        const props = page.properties || {};
-        if (props[DONE_PROPERTY]?.checkbox    === true) done++;
-        if (props[SKIPPED_PROPERTY]?.checkbox === true) skipped++;
-      }
-      return { total: pages.length, done, skipped };
-    }
-
-    function renderChart({ total, done, skipped }) {
-      const remaining = Math.max(0, total - done - skipped);
-      const pct = total > 0 ? Math.round((done / total) * 100) : 0;
-
-      document.getElementById('pctDisplay').textContent = pct + '%';
-      document.getElementById('legDone').textContent    = done;
-      document.getElementById('legSkip').textContent    = skipped;
-      document.getElementById('legRem').textContent     = remaining;
-      document.getElementById('statDone').textContent   = done;
-      document.getElementById('statSkip').textContent   = skipped;
-      document.getElementById('statTotal').textContent  = total;
+      document.getElementById('statDone').textContent = done;
+      document.getElementById('statSkip').textContent = skipped;
+      document.getElementById('statTotal').textContent = total;
 
       const chartData = {
         labels: ['Done', 'Skipped', 'Remaining'],
         datasets: [{
-          data: [done, skipped, remaining || (total === 0 ? 1 : 0)],
-          backgroundColor: ['#4ade80', '#facc15', '#2a2f42'],
-          borderWidth: 0,
-          hoverOffset: 6,
+          data: [
+            done,
+            skipped,
+            remaining || (total === 0 ? 1 : 0)
+          ],
+          backgroundColor: [
+            '#4ade80',
+            '#facc15',
+            '#2a2f42'
+          ],
+          borderWidth: 0
         }]
       };
 
       if (chart) {
+
         chart.data = chartData;
         chart.update();
+
       } else {
-        chart = new Chart(document.getElementById('donut').getContext('2d'), {
-          type: 'doughnut',
-          data: chartData,
-          options: {
-            cutout: '72%',
-            animation: { duration: 800, easing: 'easeInOutQuart' },
-            plugins: {
-              legend: { display: false },
-              tooltip: {
-                callbacks: {
-                  label: ctx => {
-                    const p = total > 0 ? Math.round((ctx.raw / total) * 100) : 0;
-                    return ` ${ctx.label}: ${ctx.raw} (${p}%)`;
-                  }
+
+        chart = new Chart(
+          document.getElementById('donut'),
+          {
+            type: 'doughnut',
+            data: chartData,
+            options: {
+              cutout: '72%',
+              plugins: {
+                legend: {
+                  display: false
                 }
               }
             }
           }
-        });
+        );
+
       }
 
-      const now = new Date();
       document.getElementById('timestamp').textContent =
-        now.toLocaleString('en-US', { weekday: 'short', month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' });
+        `${new Date().toLocaleString()} | Exec ${executionPct}% | Complete ${completionPct}%`;
 
-      document.getElementById('dashboard').classList.add('visible');
+      document
+        .getElementById('dashboard')
+        .classList.add('visible');
     }
 
     async function fetchProgress() {
-      const btn = document.getElementById('refreshBtn');
+
+      const btn =
+        document.getElementById('refreshBtn');
+
       if (btn) btn.disabled = true;
-      setStatus('<span class="spinner"></span>Fetching from Notion…');
+
+      setStatus(
+        '<span class="spinner"></span>Loading...'
+      );
 
       try {
-        const pages  = await queryAllPages();
-        const counts = countResults(pages);
+
+        const response =
+          await fetch('/api/progress');
+
+        if (!response.ok) {
+          throw new Error(
+            `Server returned ${response.status}`
+          );
+        }
+
+        const data =
+          await response.json();
+
+        renderChart(data);
+
         setStatus('');
-        renderChart(counts);
+
       } catch (err) {
-        setStatus('Error: ' + err.message, true);
+
         console.error(err);
+
+        setStatus(
+          'Error: ' + err.message,
+          true
+        );
+
       } finally {
+
         if (btn) btn.disabled = false;
+
       }
     }
 
-    // Auto-fetch on load
     fetchProgress();
+
+    setInterval(
+      fetchProgress,
+      300000
+    );
   </script>
+
 </body>
 </html>
