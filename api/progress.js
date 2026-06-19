@@ -1,6 +1,6 @@
 export default async function handler(req, res) {
   const NOTION_API_KEY = process.env.NOTION_API_KEY;
-  const DATABASE_ID = process.env.DATABASE_ID;
+  const DATABASE_ID = process.env.STEPS_DATABASE_ID;
   const DONE_PROPERTY = process.env.DONE_PROPERTY || "Done";
   const SKIPPED_PROPERTY = process.env.SKIPPED_PROPERTY || "Skipped";
 
