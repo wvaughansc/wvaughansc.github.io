@@ -7,7 +7,8 @@
 <body style="margin: 0; padding: 0;">
   <div style="background: #1a1a1a; color: #e4e4e7; border-radius: 8px; padding: 16px 20px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; display: flex; align-items: center; gap: 28px; overflow-x: auto; font-size: 15px; min-height: 90px;">
     <div id="loading" style="color: #888; flex: 1;">Loading weather…</div>
-    <div id="content" style="display: none; flex: 1; min-width: 0; display: flex; align-items: center; gap: 28px;">
+
+    <div id="content" style="display: none; flex: 1; min-width: 0; align-items: center; gap: 28px;">
 
       <div style="display: flex; align-items: baseline; gap: 10px; flex-shrink: 0;">
         <div style="font-size: 40px; font-weight: 600; line-height: 1;" id="temp">--°</div>
@@ -18,6 +19,7 @@
       </div>
 
       <div style="border-left: 1px solid #333; padding-left: 28px; display: flex; gap: 24px; flex-shrink: 0;">
+
         <div>
           <div style="font-size: 11px; color: #888; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 5px;">Wind</div>
           <div style="color: #e4e4e7; font-weight: 500; font-size: 15px;" id="wind-display">--</div>
@@ -33,7 +35,7 @@
         <div>
           <div style="font-size: 11px; color: #888; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 5px;">Pressure</div>
           <div style="color: #e4e4e7; font-weight: 500; font-size: 15px;" id="pressure">--</div>
-          <div style="font-size: 12px; color: #a1a1a6; margin-top: 3px;">Visibility <span id="visibility">--</span>mi</div>
+          <div style="font-size: 12px; color: #a1a1a6; margin-top: 3px;">Visibility <span id="visibility">--</span> mi</div>
         </div>
 
         <div>
@@ -44,11 +46,13 @@
 
         <div>
           <div style="font-size: 11px; color: #888; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 5px;">High / Low</div>
-          <div style="color: #e4e4e7; font-weight: 500; font-size: 15px;"><span id="high">--</span>° / <span id="low">--</span>°</div>
+          <div style="color: #e4e4e7; font-weight: 500; font-size: 15px;">
+            <span id="high">--</span>° / <span id="low">--</span>°
+          </div>
           <div style="font-size: 12px; color: #a1a1a6; margin-top: 3px;" id="sunrise-sunset">-- / --</div>
         </div>
-      </div>
 
+      </div>
     </div>
   </div>
 
@@ -61,7 +65,17 @@
       try {
         loadingEl.textContent = 'Fetching weather...';
 
-        const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lng}&current=temperature_2m,apparent_temperature,relative_humidity_2m,weather_code,wind_speed_10m,wind_direction_10m,pressure_msl&daily=temperature_2m_max,temperature_2m_min,sunrise,sunset,uv_index_max&temperature_unit=fahrenheit&wind_speed_unit=mph&precipitation_unit=inch&timezone=auto`;
+        const url =
+          `https://api.open-meteo.com/v1/forecast?` +
+          `latitude=${lat}` +
+          `&longitude=${lng}` +
+          `&current=temperature_2m,apparent_temperature,relative_humidity_2m,weather_code,wind_speed_10m,wind_direction_10m,wind_gusts_10m,pressure_msl,dew_point_2m,visibility` +
+          `&daily=temperature_2m_max,temperature_2m_min,sunrise,sunset,uv_index_max` +
+          `&temperature_unit=fahrenheit` +
+          `&wind_speed_unit=mph` +
+          `&visibility_unit=miles` +
+          `&precipitation_unit=inch` +
+          `&timezone=auto`;
 
         const res = await fetch(url);
 
@@ -76,6 +90,7 @@
         }
 
         document.getElementById('loading').style.display = 'none';
+
         const contentDiv = document.getElementById('content');
         contentDiv.style.display = 'flex';
 
@@ -86,18 +101,20 @@
         const feelsLike = Math.round(current.apparent_temperature);
         const humidity = current.relative_humidity_2m;
         const windSpeed = Math.round(current.wind_speed_10m);
+        const windGust = Math.round(current.wind_gusts_10m);
         const windDir = current.wind_direction_10m;
         const pressure = (current.pressure_msl / 33.8639).toFixed(2);
+        const dewPoint = Math.round(current.dew_point_2m);
+        const visibility = Math.round(current.visibility);
         const uvIndex = daily.uv_index_max[0];
 
         const high = Math.round(daily.temperature_2m_max[0]);
         const low = Math.round(daily.temperature_2m_min[0]);
 
-        const sunrise = daily.sunrise[0].split('T')[1].slice(0, 5);
-        const sunset = daily.sunset[0].split('T')[1].slice(0, 5);
+        const sunrise = formatTime(daily.sunrise[0]);
+        const sunset = formatTime(daily.sunset[0]);
 
-        const weatherCode = current.weather_code;
-        const condition = getWeatherDescription(weatherCode);
+        const condition = getWeatherDescription(current.weather_code);
 
         const uvLevel =
           uvIndex < 3 ? 'Low' :
@@ -106,33 +123,55 @@
           uvIndex < 11 ? 'Very High' :
           'Extreme';
 
-        document.getElementById('temp').textContent = temp + '°';
+        document.getElementById('temp').textContent = `${temp}°`;
         document.getElementById('condition').textContent = condition;
         document.getElementById('feels-like').textContent = feelsLike;
 
         document.getElementById('wind-display').textContent =
-          windSpeed + ' mph ' + getWindDirection(windDir);
-        document.getElementById('wind-gust').textContent = 'Gust --';
+          `${windSpeed} mph ${getWindDirection(windDir)}`;
 
-        document.getElementById('humidity').textContent = humidity + '%';
-        document.getElementById('dewpoint').textContent = '--';
+        document.getElementById('wind-gust').textContent =
+          `Gust ${windGust} mph`;
 
-        document.getElementById('pressure').textContent = pressure + ' in';
-        document.getElementById('visibility').textContent = '--';
+        document.getElementById('humidity').textContent =
+          `${humidity}%`;
 
-        document.getElementById('uv-index').textContent = Math.round(uvIndex);
-        document.getElementById('uv-level').textContent = uvLevel;
+        document.getElementById('dewpoint').textContent =
+          dewPoint;
+
+        document.getElementById('pressure').textContent =
+          `${pressure} in`;
+
+        document.getElementById('visibility').textContent =
+          visibility;
+
+        document.getElementById('uv-index').textContent =
+          Math.round(uvIndex);
+
+        document.getElementById('uv-level').textContent =
+          uvLevel;
 
         document.getElementById('high').textContent = high;
         document.getElementById('low').textContent = low;
+
         document.getElementById('sunrise-sunset').textContent =
-          sunrise + ' / ' + sunset;
+          `${sunrise} / ${sunset}`;
 
       } catch (err) {
         console.error('Weather fetch error:', err);
+
         loadingEl.innerHTML = `Error: ${err.message}`;
         loadingEl.style.fontSize = '12px';
         loadingEl.style.color = '#a1a1a6';
+      }
+
+      function formatTime(dateString) {
+        const date = new Date(dateString);
+
+        return date.toLocaleTimeString([], {
+          hour: 'numeric',
+          minute: '2-digit'
+        });
       }
 
       function getWeatherDescription(code) {
@@ -155,12 +194,11 @@
           80: 'Slight showers',
           81: 'Showers',
           82: 'Heavy showers',
-          85: 'Snow showers',
-          86: 'Heavy snow showers',
           95: 'Thunderstorm',
-          96: 'Thunderstorm with hail',
-          99: 'Thunderstorm with hail'
+          96: 'Thunderstorm + hail',
+          99: 'Severe thunderstorm'
         };
+
         return codes[code] || 'Unknown';
       }
 
@@ -171,8 +209,8 @@
           'S', 'SSW', 'SW', 'WSW',
           'W', 'WNW', 'NW', 'NNW'
         ];
-        const index = Math.round(deg / 22.5) % 16;
-        return dirs[index];
+
+        return dirs[Math.round(deg / 22.5) % 16];
       }
     })();
   </script>
