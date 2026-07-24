@@ -1,0 +1,126 @@
+<style>
+body { margin: 0; padding: 0; }
+.weather-container {
+  background: #1a1a1a;
+  border-radius: 8px;
+  padding: 1.5rem 0.5rem;
+  overflow-x: visible;
+}
+.hourly-grid {
+  display: flex;
+  gap: 0.25rem;
+  justify-content: space-between;
+}
+.hour-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  flex: 1;
+  min-width: 0;
+  padding: 10px 2px;
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 0.5px solid rgba(255, 255, 255, 0.1);
+  color: white;
+}
+.hour-time {
+  font-size: 8px;
+  color: rgba(255, 255, 255, 0.6);
+  text-transform: uppercase;
+  letter-spacing: 0.2px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+.hour-temp {
+  font-size: 13px;
+  font-weight: 600;
+  color: white;
+}
+.hour-icon {
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.8);
+  height: 14px;
+  line-height: 14px;
+}
+.hour-precip {
+  font-size: 8px;
+  color: rgba(255, 255, 255, 0.4);
+  text-align: center;
+}
+</style>
+
+<div class="weather-container">
+  <div class="hourly-grid" id="forecast"></div>
+</div>
+<link
+  rel="stylesheet"
+  href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css"
+/>
+
+<script>
+const LAT = 34.9379;
+const LON = -82.2962;
+
+const weatherCodeToIcon = code => {
+  if ([0].includes(code)) return "ti ti-sun";
+  if ([1,2].includes(code)) return "ti ti-cloud-sun";
+  if ([3].includes(code)) return "ti ti-cloud";
+  if ([45,48].includes(code)) return "ti ti-cloud-fog";
+  if ([51,53,55,56,57].includes(code)) return "ti ti-cloud-drizzle";
+  if ([61,63,65,66,67,80,81,82].includes(code)) return "ti ti-cloud-rain";
+  if ([71,73,75,77,85,86].includes(code)) return "ti ti-snowflake";
+  if ([95,96,99].includes(code)) return "ti ti-cloud-storm";
+  return "ti ti-cloud";
+};
+
+async function loadWeather() {
+
+    const url =
+`https://api.open-meteo.com/v1/forecast?latitude=${LAT}&longitude=${LON}&hourly=temperature_2m,precipitation_probability,weather_code&temperature_unit=fahrenheit&timezone=America/New_York`;
+
+    const res = await fetch(url);
+    const data = await res.json();
+
+    const now = new Date();
+
+    const forecast = [];
+
+    data.hourly.time.forEach((time, i) => {
+
+        const d = new Date(time);
+
+        if (d.getDate() !== now.getDate()) return;
+
+        if (d.getHours() < 6 || d.getHours() > 22) return;
+
+        forecast.push({
+            hour: d.getHours(),
+            temp: Math.round(data.hourly.temperature_2m[i]),
+            precip: data.hourly.precipitation_probability[i],
+            icon: weatherCodeToIcon(data.hourly.weather_code[i])
+        });
+
+    });
+
+    document.getElementById("forecast").innerHTML =
+        forecast.map(item => {
+
+            const h = item.hour;
+            const time = h % 12 === 0 ? 12 : h % 12;
+            const ampm = h < 12 ? "a" : "p";
+
+            return `
+            <div class="hour-card">
+                <div class="hour-time">${time}${ampm}</div>
+                <div class="hour-temp">${item.temp}&deg;</div>
+                <i class="hour-icon ${item.icon}"></i>
+                <div class="hour-precip">${item.precip}%</div>
+            </div>
+            `;
+
+        }).join("");
+}
+
+loadWeather();
+</script>
