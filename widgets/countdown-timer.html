@@ -142,11 +142,15 @@ function getTitle(page) {
 }
 
 function getDate(page) {
-    const dateString = page.properties?.Date?.date?.end;
+    const dateProperty = page.properties?.Date?.date;
+
+    if (!dateProperty) return null;
+
+    const dateString = dateProperty.end || dateProperty.start;
 
     if (!dateString) return null;
 
-    const date = new Date(page.properties?.Date?.date?.start);
+    const date = new Date(dateString);
 
     return isNaN(date.getTime()) ? null : date;
 }
