@@ -146,7 +146,7 @@ function getDate(page) {
 
     if (!dateString) return null;
 
-    const date = new Date(dateString);
+    const date = new Date(page.properties?.Date?.date?.start);
 
     return isNaN(date.getTime()) ? null : date;
 }
