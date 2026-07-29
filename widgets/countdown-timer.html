@@ -142,7 +142,7 @@ function getTitle(page) {
 }
 
 function getDate(page) {
-    const dateString = page.properties?.Date?.date?.start;
+    const dateString = page.properties?.Date?.date?.end;
 
     if (!dateString) return null;
 
