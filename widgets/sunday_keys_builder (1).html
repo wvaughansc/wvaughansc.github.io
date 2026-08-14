@@ -1,0 +1,1014 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sunday Keys Patch Prompt Builder</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    
+    :root {
+      --bg-primary: #ffffff;
+      --bg-secondary: #f5f5f5;
+      --bg-tertiary: #f9f8f3;
+      --text-primary: #2c2c2a;
+      --text-secondary: #888780;
+      --text-muted: #b4b2a9;
+      --border-color: #d3d1c7;
+      --border-muted: #b4b2a9;
+      --accent-color: #185fa5;
+      --accent-light: #e6f1fb;
+      --accent-hover: #b5d4f4;
+      --code-bg: #f5f5f5;
+      --shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+    
+    :root[data-mode="dark"] {
+      --bg-primary: #2c2c2a;
+      --bg-secondary: #1a1a18;
+      --bg-tertiary: #3a3a38;
+      --text-primary: #f5f5f5;
+      --text-secondary: #b4b2a9;
+      --text-muted: #888780;
+      --border-color: #4a4a48;
+      --border-muted: #5a5a58;
+      --accent-color: #5ba3e8;
+      --accent-light: #1a3a5a;
+      --accent-hover: #2a5080;
+      --code-bg: #1a1a18;
+      --shadow: 0 1px 3px rgba(0,0,0,0.4);
+    }
+    
+    @media (prefers-color-scheme: dark) {
+      :root:not([data-mode="light"]) {
+        --bg-primary: #2c2c2a;
+        --bg-secondary: #1a1a18;
+        --bg-tertiary: #3a3a38;
+        --text-primary: #f5f5f5;
+        --text-secondary: #b4b2a9;
+        --text-muted: #888780;
+        --border-color: #4a4a48;
+        --border-muted: #5a5a58;
+        --accent-color: #5ba3e8;
+        --accent-light: #1a3a5a;
+        --accent-hover: #2a5080;
+        --code-bg: #1a1a18;
+        --shadow: 0 1px 3px rgba(0,0,0,0.4);
+      }
+    }
+    
+    body { 
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: var(--bg-secondary);
+      padding: 2rem;
+      color: var(--text-primary);
+      transition: background-color 200ms, color 200ms;
+    }
+    
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      background: var(--bg-primary);
+      border-radius: 8px;
+      box-shadow: var(--shadow);
+      padding: 2rem;
+    }
+    
+    .header {
+      margin-bottom: 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+    }
+    
+    .header-text h1 {
+      font-size: 24px;
+      margin-bottom: 0.5rem;
+      color: var(--text-primary);
+    }
+    
+    .header p {
+      font-size: 14px;
+      color: var(--text-secondary);
+    }
+    
+    .theme-toggle {
+      background: none;
+      border: 1px solid var(--border-color);
+      color: var(--text-primary);
+      padding: 0.5rem 0.75rem;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 13px;
+      transition: all 150ms ease;
+    }
+    
+    .theme-toggle:hover {
+      background: var(--bg-tertiary);
+      border-color: var(--text-secondary);
+    }
+    
+    .prompt-output-area {
+      background: var(--bg-tertiary);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 1.25rem;
+      margin-bottom: 2rem;
+    }
+    
+    .prompt-label {
+      font-size: 11px;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 0.75rem;
+      font-weight: 500;
+    }
+    
+    .prompt-text {
+      font-size: 15px;
+      color: var(--text-primary);
+      line-height: 1.6;
+      margin-bottom: 1rem;
+      font-family: 'Monaco', 'Courier New', monospace;
+      min-height: 3rem;
+      word-break: break-word;
+      background: var(--code-bg);
+      padding: 0.75rem;
+      border-radius: 4px;
+    }
+    
+    .prompt-empty {
+      color: var(--text-muted);
+      font-style: italic;
+    }
+    
+    .button-group {
+      display: flex;
+      gap: 8px;
+    }
+    
+    button {
+      padding: 0.5rem 1rem;
+      border: 1px solid var(--border-color);
+      background: var(--bg-primary);
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--text-primary);
+      transition: all 150ms ease;
+    }
+    
+    button:hover {
+      background: var(--bg-tertiary);
+      border-color: var(--text-muted);
+    }
+    
+    button:active {
+      transform: scale(0.98);
+    }
+    
+    button.copy-btn {
+      flex: 1;
+      border-color: var(--accent-color);
+      color: var(--accent-color);
+      background: var(--accent-light);
+    }
+    
+    button.copy-btn:hover {
+      background: var(--accent-hover);
+    }
+    
+    button.reset-btn {
+      color: var(--text-muted);
+      font-size: 13px;
+      background: transparent;
+      border: none;
+      padding: 0.5rem 0.75rem;
+    }
+    
+    button.reset-btn:hover {
+      color: var(--text-secondary);
+    }
+    
+    .sections-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 1.5rem;
+    }
+    
+    .section {
+      border-top: 1px solid var(--border-color);
+      padding-top: 1.5rem;
+    }
+    
+    .section:first-child {
+      border-top: none;
+      padding-top: 0;
+    }
+    
+    .section-title {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 1rem;
+    }
+    
+    .subsection {
+      margin-bottom: 1.25rem;
+    }
+    
+    .subsection-label {
+      font-size: 11px;
+      color: var(--text-secondary);
+      font-weight: 600;
+      margin-bottom: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+    }
+    
+    .checkbox-group {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+      gap: 10px;
+    }
+    
+    .checkbox-wrapper {
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+    }
+    
+    input[type="checkbox"] {
+      margin-top: 4px;
+      cursor: pointer;
+      width: 16px;
+      height: 16px;
+      accent-color: var(--accent-color);
+    }
+    
+    label {
+      font-size: 14px;
+      color: var(--text-primary);
+      cursor: pointer;
+      line-height: 1.4;
+    }
+    
+    .text-input-wrapper {
+      margin-top: 0.5rem;
+    }
+    
+    textarea {
+      width: 100%;
+      padding: 0.75rem;
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      font-family: inherit;
+      font-size: 14px;
+      resize: vertical;
+      min-height: 80px;
+      color: var(--text-primary);
+      background: var(--bg-secondary);
+    }
+    
+    textarea:focus {
+      outline: none;
+      border-color: var(--accent-color);
+      box-shadow: 0 0 0 2px var(--accent-light);
+    }
+    
+    .reset-section {
+      text-align: center;
+      margin-top: 2rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid var(--border-color);
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <div class="header-text">
+        <h1>Sunday Keys Patch Prompt Builder</h1>
+        <p>Build prompts for your keyboard patches. Check descriptors as you listen to the recording.</p>
+      </div>
+      <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()">🌙 Dark</button>
+    </div>
+    
+    <div class="prompt-output-area">
+      <div class="prompt-label">Your patch prompt</div>
+      <div id="promptOutput" class="prompt-text prompt-empty">Nothing selected yet. Start checking off descriptors as you listen...</div>
+      <div class="button-group">
+        <button class="copy-btn" id="copyBtn" onclick="copyPrompt()">Copy prompt</button>
+      </div>
+    </div>
+    
+    <div class="sections-grid">
+      <!-- PIANO SECTION -->
+      <div class="section">
+        <div class="section-title">Piano</div>
+        
+        <div class="subsection">
+          <div class="subsection-label">Brightness</div>
+          <div class="checkbox-group">
+            <div class="checkbox-wrapper">
+              <input type="checkbox" id="piano_bright" class="descriptor" data-section="0" value="Bright" onchange="updatePrompt()">
+              <label for="piano_bright">Bright</label>
+            </div>
+            <div class="checkbox-wrapper">
+              <input type="checkbox" id="piano_dark" class="descriptor" data-section="0" value="Dark" onchange="updatePrompt()">
+              <label for="piano_dark">Dark</label>
+            </div>
+            <div class="checkbox-wrapper">
+              <input type="checkbox" id="piano_warm" class="descriptor" data-section="0" value="Warm" onchange="updatePrompt()">
+              <label for="piano_warm">Warm</label>
+            </div>
+            <div class="checkbox-wrapper">
+              <input type="checkbox" id="piano_mellow" class="descriptor" data-section="0" value="Mellow" onchange="updatePrompt()">
+              <label for="piano_mellow">Mellow</label>
+            </div>
+            <div class="checkbox-wrapper">
+              <input type="checkbox" id="piano_crisp" class="descriptor" data-section="0" value="Crisp" onchange="updatePrompt()">
+              <label for="piano_crisp">Crisp</label>
+            </div>
+            <div class="checkbox-wrapper">
+              <input type="checkbox" id="piano_soft" class="descriptor" data-section="0" value="Soft" onchange="updatePrompt()">
+              <label for="piano_soft">Soft</label>
+            </div>
+          </div>
+        </div>
+        
+        <div class="subsection">
+          <div class="subsection-label">Piano Type</div>
+          <div class="checkbox-group">
+            <div class="checkbox-wrapper">
+              <input type="checkbox" id="piano_concert_grand" class="descriptor" data-section="0" value="Concert Grand" onchange="updatePrompt()">
+              <label for="piano_concert_grand">Concert Grand</label>
+            </div>
+            <div class="checkbox-wrapper">
+              <input type="checkbox" id="piano_stage_grand" class="descriptor" data-section="0" value="Stage Grand" onchange="updatePrompt()">
+              <label for="piano_stage_grand">Stage Grand</label>
+            </div>
+            <div class="checkbox-wrapper">
+              <input type="checkbox" id="piano_upright" class="descriptor" data-section="0" value="Upright" onchange="updatePrompt()">
+              <label for="piano_upright">Upright</label>
+            </div>
+            <div class="checkbox-wrapper">
+              <input type="checkbox" id="piano_felt" class="descriptor" data-section="0" value="Felt" onchange="updatePrompt()">
+              <label for="piano_felt">Felt</label>
+            </div>
+            <div class="checkbox-wrapper">
+              <input type="checkbox" id="piano_vintage" class="descriptor" data-section="0" value="Vintage" onchange="updatePrompt()">
+              <label for="piano_vintage">Vintage</label>
+            </div>
+            <div class="checkbox-wrapper">
+              <input type="checkbox" id="piano_electric" class="descriptor" data-section="0" value="Electric" onchange="updatePrompt()">
+              <label for="piano_electric">Electric</label>
+            </div>
+          </div>
+        </div>
+        
+        <div class="subsection">
+          <div class="subsection-label">Character & Space</div>
+          <div class="checkbox-group">
+            <div class="checkbox-wrapper">
+              <input type="checkbox" id="piano_intimate" class="descriptor" data-section="0" value="Intimate" onchange="updatePrompt()">
+              <label for="piano_intimate">Intimate</label>
+            </div>
+            <div class="checkbox-wrapper">
+              <input type="checkbox" id="piano_close" class="descriptor" data-section="0" value="Close" onchange="updatePrompt()">
+              <label for="piano_close">Close</label>
+            </div>
+            <div class="checkbox-wrapper">
+              <input type="checkbox" id="piano_cinematic" class="descriptor" data-section="0" value="Cinematic" onchange="updatePrompt()">
+              <label for="piano_cinematic">Cinematic</label>
+            </div>
+            <div class="checkbox-wrapper">
+              <input type="checkbox" id="piano_dry" class="descriptor" data-section="0" value="Dry" onchange="updatePrompt()">
+              <label for="piano_dry">Dry</label>
+            </div>
+            <div class="checkbox-wrapper">
+              <input type="checkbox" id="piano_room" class="descriptor" data-section="0" value="Room" onchange="updatePrompt()">
+              <label for="piano_room">Room</label>
+            </div>
+            <div class="checkbox-wrapper">
+              <input type="checkbox" id="piano_hall" class="descriptor" data-section="0" value="Hall" onchange="updatePrompt()">
+              <label for="piano_hall">Hall</label>
+            </div>
+          </div>
+        </div>
+        
+        <div class="subsection">
+          <div class="subsection-label">Effects</div>
+          <div class="checkbox-group">
+            <div class="checkbox-wrapper">
+              <input type="checkbox" id="piano_fx_reverb" class="effect" data-section="0" value="Reverb" onchange="updatePrompt()">
+              <label for="piano_fx_reverb">Reverb</label>
+            </div>
+            <div class="checkbox-wrapper">
+              <input type="checkbox" id="piano_fx_delay" class="effect" data-section="0" value="Delay" onchange="updatePrompt()">
+              <label for="piano_fx_delay">Delay</label>
+            </div>
+            <div class="checkbox-wrapper">
+              <input type="checkbox" id="piano_fx_chorus" class="effect" data-section="0" value="Chorus" onchange="updatePrompt()">
+              <label for="piano_fx_chorus">Chorus</label>
+            </div>
+            <div class="checkbox-wrapper">
+              <input type="checkbox" id="piano_fx_compression" class="effect" data-section="0" value="Compression" onchange="updatePrompt()">
+              <label for="piano_fx_compression">Compression</label>
+            </div>
+            <div class="checkbox-wrapper">
+              <input type="checkbox" id="piano_fx_saturation" class="effect" data-section="0" value="Saturation" onchange="updatePrompt()">
+              <label for="piano_fx_saturation">Saturation</label>
+            </div>
+            <div class="checkbox-wrapper">
+              <input type="checkbox" id="piano_fx_distortion" class="effect" data-section="0" value="Distortion" onchange="updatePrompt()">
+              <label for="piano_fx_distortion">Distortion</label>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- PAD SECTION -->
+      <div class="section">
+        <div class="section-title">Pad</div>
+        
+        <div class="subsection">
+          <div class="subsection-label">Brightness & Tone</div>
+          <div class="checkbox-group">
+            <div class="checkbox-wrapper">
+              <input type="checkbox" id="pad_warm" class="descriptor" data-section="1" value="Warm" onchange="updatePrompt()">
+              <label for="pad_warm">Warm</label>
+            </div>
+            <div class="checkbox-wrapper">
+              <input type="checkbox" id="pad_dark" class="descriptor" data-section="1" value="Dark" onchange="updatePrompt()">
+              <label for="pad_dark">Dark</label>
+            </div>
+            <div class="checkbox-wrapper">
+              <input type="checkbox" id="pad_bright" class="descriptor" data-section="1" value="Bright" onchange="updatePrompt()">
+              <label for="pad_bright">Bright</label>
+            </div>
+            <div class="checkbox-wrapper">
+              <input type="checkbox" id="pad_mellow" class="descriptor" data-section="1" value="Mellow" onchange="updatePrompt()">
+              <label for="pad_mellow">Mellow</label>
+            </div>
+            <div class="checkbox-wrapper">
+              <input type="checkbox" id="pad_airy" class="descriptor" data-section="1" value="Airy" onchange="updatePrompt()">
+              <label for="pad_airy">Airy</label>
+            </div>
+            <div class="checkbox-wrapper">
+              <input type="checkbox" id="pad_shimmer" class="descriptor" data-section="1" value="Shimmer" onchange="updatePrompt()">
+              <label for="pad_shimmer">Shimmer</label>
+            </div>
+          </div>
+        </div>
+        
+        <div class="subsection">
+          <div class="subsection-label">Texture</div>
+          <div class="checkbox-group">
+            <div class="checkbox-wrapper">
+              <input type="checkbox" id="pad_smooth" class="descriptor" data-section="1" value="Smooth" onchange="updatePrompt()">
+              <label for="pad_smooth">Smooth</label>
+            </div>
+            <div class="checkbox-wrapper">
+              <input type="checkbox" id="pad_lush" class="descriptor" data-section="1" value="Lush" onchange="updatePrompt()">
+              <label for="pad_lush">Lush</label>
+            </div>
+            <div class="checkbox-wrapper">
+              <input type="checkbox" id="pad_dreamy" class="descriptor" data-section="1" value="Dreamy" onchange="updatePrompt()">
+              <label for="pad_dreamy">Dreamy</label>
+            </div>
+            <div class="checkbox-wrapper">
+              <input type="checkbox" id="pad_ethereal" class="descriptor" data-section="1" value="Ethereal" onchange="updatePrompt()">
+              <label for="pad_ethereal">Ethereal</label>
+            </div>
+            <div class="checkbox-wrapper">
+              <input type="checkbox" id="pad_cloudy" class="descriptor" data-section="1" value="Cloudy" onchange="updatePrompt()">
+              <label for="pad_cloudy">Cloudy</label>
+            </div>
+            <div class="checkbox-wrapper">
+              <input type="checkbox" id="pad_hazy" class="descriptor" data-section="1" value="Hazy" onchange="updatePrompt()">
+              <label for="pad_hazy">Hazy</label>
+            </div>
+          </div>
+        </div>
+        
+        <div class="subsection">
+          <div class="subsection-label">Movement</div>
+          <div class="checkbox-group">
+            <div class="checkbox-wrapper">
+              <input type="checkbox" id="pad_static" class="descriptor" data-section="1" value="Static" onchange="updatePrompt()">
+              <label for="pad_static">Static</label>
+            </div>
+            <div class="checkbox-wrapper">
+              <input type="checkbox" id="pad_evolving" class="descriptor" data-section="1" value="Evolving" onchange="updatePrompt()">
+              <label for="pad_evolving">Evolving</label>
+            </div>
+            <div class="checkbox-wrapper">
+              <input type="checkbox" id="pad_swelling" class="descriptor" data-section="1" value="Swelling" onchange="updatePrompt()">
+              <label for="pad_swelling">Swelling</label>
+            </div>
+            <div class="checkbox-wrapper">
+              <input type="checkbox" id="pad_pulsing" class="descriptor" data-section="1" value="Pulsing" onchange="updatePrompt()">
+              <label for="pad_pulsing">Pulsing</label>
+            </div>
+            <div class="checkbox-wrapper">
+              <input type="checkbox" id="pad_swirling" class="descriptor" data-section="1" value="Swirling" onchange="updatePrompt()">
+              <label for="pad_swirling">Swirling</label>
+            </div>
+            <div class="checkbox-wrapper">
+              <input type="checkbox" id="pad_wavy" class="descriptor" data-section="1" value="Wavy" onchange="updatePrompt()">
+              <label for="pad_wavy">Wavy</label>
+            </div>
+          </div>
+        </div>
+        
+        <div class="subsection">
+          <div class="subsection-label">Space</div>
+          <div class="checkbox-group">
+            <div class="checkbox-wrapper">
+              <input type="checkbox" id="pad_wide" class="descriptor" data-section="1" value="Wide" onchange="updatePrompt()">
+              <label for="pad_wide">Wide</label>
+            </div>
+            <div class="checkbox-wrapper">
+              <input type="checkbox" id="pad_huge" class="descriptor" data-section="1" value="Huge" onchange="updatePrompt()">
+              <label for="pad_huge">Huge</label>
+            </div>
+            <div class="checkbox-wrapper">
+              <input type="checkbox" id="pad_ambient" class="descriptor" data-section="1" value="Ambient" onchange="updatePrompt()">
+              <label for="pad_ambient">Ambient</label>
+            </div>
+            <div class="checkbox-wrapper">
+              <input type="checkbox" id="pad_wet" class="descriptor" data-section="1" value="Wet" onchange="updatePrompt()">
+              <label for="pad_wet">Wet</label>
+            </div>
+            <div class="checkbox-wrapper">
+              <input type="checkbox" id="pad_dry" class="descriptor" data-section="1" value="Dry" onchange="updatePrompt()">
+              <label for="pad_dry">Dry</label>
+            </div>
+          </div>
+        </div>
+        
+        <div class="subsection">
+          <div class="subsection-label">Effects</div>
+          <div class="checkbox-group">
+            <div class="checkbox-wrapper">
+              <input type="checkbox" id="pad_fx_reverb" class="effect" data-section="1" value="Reverb" onchange="updatePrompt()">
+              <label for="pad_fx_reverb">Reverb</label>
+            </div>
+            <div class="checkbox-wrapper">
+              <input type="checkbox" id="pad_fx_delay" class="effect" data-section="1" value="Delay" onchange="updatePrompt()">
+              <label for="pad_fx_delay">Delay</label>
+            </div>
+            <div class="checkbox-wrapper">
+              <input type="checkbox" id="pad_fx_chorus" class="effect" data-section="1" value="Chorus" onchange="updatePrompt()">
+              <label for="pad_fx_chorus">Chorus</label>
+            </div>
+            <div class="checkbox-wrapper">
+              <input type="checkbox" id="pad_fx_compression" class="effect" data-section="1" value="Compression" onchange="updatePrompt()">
+              <label for="pad_fx_compression">Compression</label>
+            </div>
+            <div class="checkbox-wrapper">
+              <input type="checkbox" id="pad_fx_saturation" class="effect" data-section="1" value="Saturation" onchange="updatePrompt()">
+              <label for="pad_fx_saturation">Saturation</label>
+            </div>
+            <div class="checkbox-wrapper">
+              <input type="checkbox" id="pad_fx_distortion" class="effect" data-section="1" value="Distortion" onchange="updatePrompt()">
+              <label for="pad_fx_distortion">Distortion</label>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- STRINGS SECTION -->
+      <div class="section">
+        <div class="section-title">Strings</div>
+        
+        <div class="subsection">
+          <div class="subsection-label">Ensemble</div>
+          <div class="checkbox-group">
+            <div class="checkbox-wrapper">
+              <input type="checkbox" id="strings_ensemble" class="descriptor" data-section="2" value="Ensemble" onchange="updatePrompt()">
+              <label for="strings_ensemble">Ensemble</label>
+            </div>
+            <div class="checkbox-wrapper">
+              <input type="checkbox" id="strings_solo" class="descriptor" data-section="2" value="Solo" onchange="updatePrompt()">
+              <label for="strings_solo">Solo</label>
+            </div>
+            <div class="checkbox-wrapper">
+              <input type="checkbox" id="strings_orchestral" class="descriptor" data-section="2" value="Orchestral" onchange="updatePrompt()">
+              <label for="strings_orchestral">Orchestral</label>
+            </div>
+            <div class="checkbox-wrapper">
+              <input type="checkbox" id="strings_chamber" class="descriptor" data-section="2" value="Chamber" onchange="updatePrompt()">
+              <label for="strings_chamber">Chamber</label>
+            </div>
+            <div class="checkbox-wrapper">
+              <input type="checkbox" id="strings_cinematic" class="descriptor" data-section="2" value="Cinematic" onchange="updatePrompt()">
+              <label for="strings_cinematic">Cinematic</label>
+            </div>
+          </div>
+        </div>
+        
+        <div class="subsection">
+          <div class="subsection-label">Tone</div>
+          <div class="checkbox-group">
+            <div class="checkbox-wrapper">
+              <input type="checkbox" id="strings_warm" class="descriptor" data-section="2" value="Warm" onchange="updatePrompt()">
+              <label for="strings_warm">Warm</label>
+            </div>
+            <div class="checkbox-wrapper">
+              <input type="checkbox" id="strings_dark" class="descriptor" data-section="2" value="Dark" onchange="updatePrompt()">
+              <label for="strings_dark">Dark</label>
+            </div>
+            <div class="checkbox-wrapper">
+              <input type="checkbox" id="strings_bright" class="descriptor" data-section="2" value="Bright" onchange="updatePrompt()">
+              <label for="strings_bright">Bright</label>
+            </div>
+            <div class="checkbox-wrapper">
+              <input type="checkbox" id="strings_lush" class="descriptor" data-section="2" value="Lush" onchange="updatePrompt()">
+              <label for="strings_lush">Lush</label>
+            </div>
+            <div class="checkbox-wrapper">
+              <input type="checkbox" id="strings_soft" class="descriptor" data-section="2" value="Soft" onchange="updatePrompt()">
+              <label for="strings_soft">Soft</label>
+            </div>
+          </div>
+        </div>
+        
+        <div class="subsection">
+          <div class="subsection-label">Articulation</div>
+          <div class="checkbox-group">
+            <div class="checkbox-wrapper">
+              <input type="checkbox" id="strings_sustained" class="descriptor" data-section="2" value="Sustained" onchange="updatePrompt()">
+              <label for="strings_sustained">Sustained</label>
+            </div>
+            <div class="checkbox-wrapper">
+              <input type="checkbox" id="strings_legato" class="descriptor" data-section="2" value="Legato" onchange="updatePrompt()">
+              <label for="strings_legato">Legato</label>
+            </div>
+            <div class="checkbox-wrapper">
+              <input type="checkbox" id="strings_pizzicato" class="descriptor" data-section="2" value="Pizzicato" onchange="updatePrompt()">
+              <label for="strings_pizzicato">Pizzicato</label>
+            </div>
+            <div class="checkbox-wrapper">
+              <input type="checkbox" id="strings_tremolo" class="descriptor" data-section="2" value="Tremolo" onchange="updatePrompt()">
+              <label for="strings_tremolo">Tremolo</label>
+            </div>
+            <div class="checkbox-wrapper">
+              <input type="checkbox" id="strings_swell" class="descriptor" data-section="2" value="Swell" onchange="updatePrompt()">
+              <label for="strings_swell">Swell</label>
+            </div>
+          </div>
+        </div>
+        
+        <div class="subsection">
+          <div class="subsection-label">Character & Space</div>
+          <div class="checkbox-group">
+            <div class="checkbox-wrapper">
+              <input type="checkbox" id="strings_ambient" class="descriptor" data-section="2" value="Ambient" onchange="updatePrompt()">
+              <label for="strings_ambient">Ambient</label>
+            </div>
+            <div class="checkbox-wrapper">
+              <input type="checkbox" id="strings_wide" class="descriptor" data-section="2" value="Wide" onchange="updatePrompt()">
+              <label for="strings_wide">Wide</label>
+            </div>
+            <div class="checkbox-wrapper">
+              <input type="checkbox" id="strings_intimate" class="descriptor" data-section="2" value="Intimate" onchange="updatePrompt()">
+              <label for="strings_intimate">Intimate</label>
+            </div>
+            <div class="checkbox-wrapper">
+              <input type="checkbox" id="strings_emotional" class="descriptor" data-section="2" value="Emotional" onchange="updatePrompt()">
+              <label for="strings_emotional">Emotional</label>
+            </div>
+          </div>
+        </div>
+        
+        <div class="subsection">
+          <div class="subsection-label">Effects</div>
+          <div class="checkbox-group">
+            <div class="checkbox-wrapper">
+              <input type="checkbox" id="strings_fx_reverb" class="effect" data-section="2" value="Reverb" onchange="updatePrompt()">
+              <label for="strings_fx_reverb">Reverb</label>
+            </div>
+            <div class="checkbox-wrapper">
+              <input type="checkbox" id="strings_fx_delay" class="effect" data-section="2" value="Delay" onchange="updatePrompt()">
+              <label for="strings_fx_delay">Delay</label>
+            </div>
+            <div class="checkbox-wrapper">
+              <input type="checkbox" id="strings_fx_chorus" class="effect" data-section="2" value="Chorus" onchange="updatePrompt()">
+              <label for="strings_fx_chorus">Chorus</label>
+            </div>
+            <div class="checkbox-wrapper">
+              <input type="checkbox" id="strings_fx_compression" class="effect" data-section="2" value="Compression" onchange="updatePrompt()">
+              <label for="strings_fx_compression">Compression</label>
+            </div>
+            <div class="checkbox-wrapper">
+              <input type="checkbox" id="strings_fx_saturation" class="effect" data-section="2" value="Saturation" onchange="updatePrompt()">
+              <label for="strings_fx_saturation">Saturation</label>
+            </div>
+            <div class="checkbox-wrapper">
+              <input type="checkbox" id="strings_fx_distortion" class="effect" data-section="2" value="Distortion" onchange="updatePrompt()">
+              <label for="strings_fx_distortion">Distortion</label>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- SYNTH SECTION -->
+      <div class="section">
+        <div class="section-title">Synth</div>
+        
+        <div class="subsection">
+          <div class="subsection-label">Character</div>
+          <div class="checkbox-group">
+            <div class="checkbox-wrapper">
+              <input type="checkbox" id="synth_dark" class="descriptor" data-section="3" value="Dark" onchange="updatePrompt()">
+              <label for="synth_dark">Dark</label>
+            </div>
+            <div class="checkbox-wrapper">
+              <input type="checkbox" id="synth_warm" class="descriptor" data-section="3" value="Warm" onchange="updatePrompt()">
+              <label for="synth_warm">Warm</label>
+            </div>
+            <div class="checkbox-wrapper">
+              <input type="checkbox" id="synth_bright" class="descriptor" data-section="3" value="Bright" onchange="updatePrompt()">
+              <label for="synth_bright">Bright</label>
+            </div>
+            <div class="checkbox-wrapper">
+              <input type="checkbox" id="synth_clean" class="descriptor" data-section="3" value="Clean" onchange="updatePrompt()">
+              <label for="synth_clean">Clean</label>
+            </div>
+            <div class="checkbox-wrapper">
+              <input type="checkbox" id="synth_aggressive" class="descriptor" data-section="3" value="Aggressive" onchange="updatePrompt()">
+              <label for="synth_aggressive">Aggressive</label>
+            </div>
+            <div class="checkbox-wrapper">
+              <input type="checkbox" id="synth_soft" class="descriptor" data-section="3" value="Soft" onchange="updatePrompt()">
+              <label for="synth_soft">Soft</label>
+            </div>
+          </div>
+        </div>
+        
+        <div class="subsection">
+          <div class="subsection-label">Type & Behavior</div>
+          <div class="checkbox-group">
+            <div class="checkbox-wrapper">
+              <input type="checkbox" id="synth_analog" class="descriptor" data-section="3" value="Analog" onchange="updatePrompt()">
+              <label for="synth_analog">Analog</label>
+            </div>
+            <div class="checkbox-wrapper">
+              <input type="checkbox" id="synth_retro" class="descriptor" data-section="3" value="Retro" onchange="updatePrompt()">
+              <label for="synth_retro">Retro</label>
+            </div>
+            <div class="checkbox-wrapper">
+              <input type="checkbox" id="synth_vintage" class="descriptor" data-section="3" value="Vintage" onchange="updatePrompt()">
+              <label for="synth_vintage">Vintage</label>
+            </div>
+            <div class="checkbox-wrapper">
+              <input type="checkbox" id="synth_lead" class="descriptor" data-section="3" value="Lead" onchange="updatePrompt()">
+              <label for="synth_lead">Lead</label>
+            </div>
+            <div class="checkbox-wrapper">
+              <input type="checkbox" id="synth_pluck" class="descriptor" data-section="3" value="Pluck" onchange="updatePrompt()">
+              <label for="synth_pluck">Pluck</label>
+            </div>
+            <div class="checkbox-wrapper">
+              <input type="checkbox" id="synth_bass" class="descriptor" data-section="3" value="Bass" onchange="updatePrompt()">
+              <label for="synth_bass">Bass</label>
+            </div>
+          </div>
+        </div>
+        
+        <div class="subsection">
+          <div class="subsection-label">Texture</div>
+          <div class="checkbox-group">
+            <div class="checkbox-wrapper">
+              <input type="checkbox" id="synth_glass" class="descriptor" data-section="3" value="Glass" onchange="updatePrompt()">
+              <label for="synth_glass">Glass</label>
+            </div>
+            <div class="checkbox-wrapper">
+              <input type="checkbox" id="synth_shimmering" class="descriptor" data-section="3" value="Shimmering" onchange="updatePrompt()">
+              <label for="synth_shimmering">Shimmering</label>
+            </div>
+            <div class="checkbox-wrapper">
+              <input type="checkbox" id="synth_thick" class="descriptor" data-section="3" value="Thick" onchange="updatePrompt()">
+              <label for="synth_thick">Thick</label>
+            </div>
+            <div class="checkbox-wrapper">
+              <input type="checkbox" id="synth_fat" class="descriptor" data-section="3" value="Fat" onchange="updatePrompt()">
+              <label for="synth_fat">Fat</label>
+            </div>
+            <div class="checkbox-wrapper">
+              <input type="checkbox" id="synth_airy" class="descriptor" data-section="3" value="Airy" onchange="updatePrompt()">
+              <label for="synth_airy">Airy</label>
+            </div>
+            <div class="checkbox-wrapper">
+              <input type="checkbox" id="synth_metallic" class="descriptor" data-section="3" value="Metallic" onchange="updatePrompt()">
+              <label for="synth_metallic">Metallic</label>
+            </div>
+          </div>
+        </div>
+        
+        <div class="subsection">
+          <div class="subsection-label">Movement</div>
+          <div class="checkbox-group">
+            <div class="checkbox-wrapper">
+              <input type="checkbox" id="synth_static" class="descriptor" data-section="3" value="Static" onchange="updatePrompt()">
+              <label for="synth_static">Static</label>
+            </div>
+            <div class="checkbox-wrapper">
+              <input type="checkbox" id="synth_pulsing" class="descriptor" data-section="3" value="Pulsing" onchange="updatePrompt()">
+              <label for="synth_pulsing">Pulsing</label>
+            </div>
+            <div class="checkbox-wrapper">
+              <input type="checkbox" id="synth_evolving" class="descriptor" data-section="3" value="Evolving" onchange="updatePrompt()">
+              <label for="synth_evolving">Evolving</label>
+            </div>
+            <div class="checkbox-wrapper">
+              <input type="checkbox" id="synth_arp" class="descriptor" data-section="3" value="Arp" onchange="updatePrompt()">
+              <label for="synth_arp">Arp</label>
+            </div>
+            <div class="checkbox-wrapper">
+              <input type="checkbox" id="synth_wobbling" class="descriptor" data-section="3" value="Wobbling" onchange="updatePrompt()">
+              <label for="synth_wobbling">Wobbling</label>
+            </div>
+          </div>
+        </div>
+        
+        <div class="subsection">
+          <div class="subsection-label">Effects</div>
+          <div class="checkbox-group">
+            <div class="checkbox-wrapper">
+              <input type="checkbox" id="synth_fx_reverb" class="effect" data-section="3" value="Reverb" onchange="updatePrompt()">
+              <label for="synth_fx_reverb">Reverb</label>
+            </div>
+            <div class="checkbox-wrapper">
+              <input type="checkbox" id="synth_fx_delay" class="effect" data-section="3" value="Delay" onchange="updatePrompt()">
+              <label for="synth_fx_delay">Delay</label>
+            </div>
+            <div class="checkbox-wrapper">
+              <input type="checkbox" id="synth_fx_chorus" class="effect" data-section="3" value="Chorus" onchange="updatePrompt()">
+              <label for="synth_fx_chorus">Chorus</label>
+            </div>
+            <div class="checkbox-wrapper">
+              <input type="checkbox" id="synth_fx_compression" class="effect" data-section="3" value="Compression" onchange="updatePrompt()">
+              <label for="synth_fx_compression">Compression</label>
+            </div>
+            <div class="checkbox-wrapper">
+              <input type="checkbox" id="synth_fx_saturation" class="effect" data-section="3" value="Saturation" onchange="updatePrompt()">
+              <label for="synth_fx_saturation">Saturation</label>
+            </div>
+            <div class="checkbox-wrapper">
+              <input type="checkbox" id="synth_fx_distortion" class="effect" data-section="3" value="Distortion" onchange="updatePrompt()">
+              <label for="synth_fx_distortion">Distortion</label>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- OTHER SECTION -->
+      <div class="section">
+        <div class="section-title">Other</div>
+        <p style="font-size: 14px; color: #888780; margin-bottom: 0.75rem;">Add any other descriptors or notes you're hearing</p>
+        <div class="text-input-wrapper">
+          <textarea id="otherText" placeholder="E.g., 'Hymn-like quality', 'Reminiscent of hymn intro', 'Lots of hand clapping', etc." onchange="updatePrompt()" oninput="updatePrompt()"></textarea>
+        </div>
+      </div>
+    </div>
+    
+    <div class="reset-section">
+      <button class="reset-btn" onclick="resetAll()">Clear all selections</button>
+    </div>
+  </div>
+
+  <script>
+    const SECTION_NAMES = ['Piano', 'Pad', 'Strings', 'Synth'];
+    
+    function initializeTheme() {
+      const saved = localStorage.getItem('theme-mode');
+      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      
+      let mode = saved || (prefersDark ? 'dark' : 'light');
+      document.documentElement.setAttribute('data-mode', mode);
+      updateThemeButton(mode);
+    }
+    
+    function toggleTheme() {
+      const current = document.documentElement.getAttribute('data-mode') || 'light';
+      const newMode = current === 'dark' ? 'light' : 'dark';
+      document.documentElement.setAttribute('data-mode', newMode);
+      localStorage.setItem('theme-mode', newMode);
+      updateThemeButton(newMode);
+    }
+    
+    function updateThemeButton(mode) {
+      const btn = document.getElementById('themeToggle');
+      btn.textContent = mode === 'dark' ? '☀️ Light' : '🌙 Dark';
+    }
+    
+    function updatePrompt() {
+      const sections = [[], [], [], []];
+      const effects = [[], [], [], []];
+      
+      document.querySelectorAll('.descriptor:checked').forEach(cb => {
+        const sectionIdx = parseInt(cb.dataset.section);
+        sections[sectionIdx].push(cb.value);
+      });
+      
+      document.querySelectorAll('.effect:checked').forEach(cb => {
+        const sectionIdx = parseInt(cb.dataset.section);
+        effects[sectionIdx].push(cb.value);
+      });
+      
+      const otherText = document.getElementById('otherText').value.trim();
+      
+      // Build prompt with periods between sections
+      const parts = [];
+      
+      for (let i = 0; i < 4; i++) {
+        if (sections[i].length > 0) {
+          parts.push(sections[i].join(', '));
+        }
+      }
+      
+      // Add effects with labels
+      const effectParts = [];
+      for (let i = 0; i < 4; i++) {
+        if (effects[i].length > 0) {
+          effectParts.push(`${SECTION_NAMES[i]}: ${effects[i].join(', ')}`);
+        }
+      }
+      if (effectParts.length > 0) {
+        parts.push(effectParts.join(', '));
+      }
+      
+      if (otherText) {
+        parts.push(otherText);
+      }
+      
+      const promptOutput = document.getElementById('promptOutput');
+      
+      if (parts.length === 0) {
+        promptOutput.textContent = 'Nothing selected yet. Start checking off descriptors as you listen...';
+        promptOutput.classList.add('prompt-empty');
+      } else {
+        const prompt = parts.join('. ') + '. Only use 3 instruments.';
+        promptOutput.textContent = prompt;
+        promptOutput.classList.remove('prompt-empty');
+      }
+      
+      // Save to localStorage
+      const checkboxIds = Array.from(document.querySelectorAll('.descriptor:checked, .effect:checked')).map(cb => cb.id);
+      localStorage.setItem('patchPrompt', JSON.stringify({
+        checkboxes: checkboxIds,
+        other: otherText
+      }));
+    }
+    
+    function copyPrompt() {
+      const promptText = document.getElementById('promptOutput').textContent;
+      if (promptText.includes('Nothing selected')) {
+        return;
+      }
+      
+      navigator.clipboard.writeText(promptText).then(() => {
+        const copyBtn = document.getElementById('copyBtn');
+        const originalText = copyBtn.textContent;
+        copyBtn.textContent = 'Copied!';
+        setTimeout(() => {
+          copyBtn.textContent = originalText;
+        }, 2000);
+      });
+    }
+    
+    function resetAll() {
+      document.querySelectorAll('input[type="checkbox"]').forEach(cb => cb.checked = false);
+      document.getElementById('otherText').value = '';
+      updatePrompt();
+    }
+    
+    // Load from localStorage on page load
+    window.addEventListener('DOMContentLoaded', () => {
+      initializeTheme();
+      
+      const saved = localStorage.getItem('patchPrompt');
+      if (saved) {
+        try {
+          const { checkboxes, other } = JSON.parse(saved);
+          checkboxes.forEach(id => {
+            const cb = document.getElementById(id);
+            if (cb) cb.checked = true;
+          });
+          if (other) {
+            document.getElementById('otherText').value = other;
+          }
+          updatePrompt();
+        } catch (e) {
+          console.log('Could not restore from localStorage');
+        }
+      }
+    });
+  </script>
+</body>
+</html>
