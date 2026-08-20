@@ -969,17 +969,48 @@
     function copyPrompt() {
       const promptText = document.getElementById('promptOutput').textContent;
       if (promptText.includes('Nothing selected')) {
+        alert('Select some descriptors first!');
         return;
       }
       
-      navigator.clipboard.writeText(promptText).then(() => {
-        const copyBtn = document.getElementById('copyBtn');
-        const originalText = copyBtn.textContent;
-        copyBtn.textContent = 'Copied!';
+      const copyBtn = document.getElementById('copyBtn');
+      const originalText = copyBtn.textContent;
+      
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(promptText).then(() => {
+          copyBtn.textContent = 'Copied!';
+          setTimeout(() => {
+            copyBtn.textContent = originalText;
+          }, 2000);
+        }).catch(err => {
+          console.error('Clipboard write failed:', err);
+          fallbackCopy(promptText, copyBtn, originalText);
+        });
+      } else {
+        // Fallback for older browsers
+        fallbackCopy(promptText, copyBtn, originalText);
+      }
+    }
+    
+    function fallbackCopy(text, btn, originalText) {
+      const textarea = document.createElement('textarea');
+      textarea.value = text;
+      document.body.appendChild(textarea);
+      textarea.select();
+      try {
+        document.execCommand('copy');
+        btn.textContent = 'Copied!';
         setTimeout(() => {
-          copyBtn.textContent = originalText;
+          btn.textContent = originalText;
         }, 2000);
-      });
+      } catch (err) {
+        console.error('Fallback copy failed:', err);
+        btn.textContent = 'Copy failed';
+        setTimeout(() => {
+          btn.textContent = originalText;
+        }, 2000);
+      }
+      document.body.removeChild(textarea);
     }
     
     function resetAll() {
